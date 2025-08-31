@@ -1,0 +1,12 @@
+streamlit
+pandas
+numpy
+gtts
+tabulate
+matplotlib
+qrcode
+wordcloud
+streamlit-drawable-canvas
+openpyxl
+nltk
+requests
