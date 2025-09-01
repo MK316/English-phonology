@@ -91,7 +91,7 @@ with tabs[2]:
         selected_course = st.selectbox("🌱 Step 2: Select Course for Grouping", course_list)
 
         # Step 2: Group size input
-        st.markdown("##### 🌱 Step3: Group Settings (Currently 21 students: 3*3G and 4*3G)")
+        st.markdown("##### 🌱 Step3: Group Settings (Currently 21 students: 3 member-3G and 4member-3G)")
         num_group3 = st.number_input("Number of 3-member groups", min_value=0, step=1)
         num_group4 = st.number_input("Number of 4-member groups", min_value=0, step=1)
 
