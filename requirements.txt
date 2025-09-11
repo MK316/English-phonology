@@ -10,3 +10,4 @@ streamlit-drawable-canvas
 openpyxl
 nltk
 requests
+reportlab
