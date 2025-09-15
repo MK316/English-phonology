@@ -23,9 +23,14 @@ apps = [
         "description": "Test your understanding of key phonetics terms from Chapter 1 through interactive quizzes."
     },
     {
-        "name": "4. (TBA)",
-        "url": "",
-        "description": "This app will be announced soon. Stay tuned for new phonetics resources!"
+        "name": "4. IPA practice",
+        "url": "https://ipa-practice.streamlit.app/",
+        "description": "Practice your familiarity with English IPA symbols by identifying articulatory features."
+    },
+    {
+        "name": "5. IPA quiz",
+        "url": "https://ipa-quiz2.streamlit.app/",
+        "description": "IPA quiz application."
     }
 ]
 
