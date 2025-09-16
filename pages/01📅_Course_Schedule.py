@@ -22,9 +22,9 @@ with tab1:
     schedule_content = {
         "2025-09-02": ["Ch. 1", "Syllabus, Course overview", "Grouping", "Reading Chapter 1"],
         "2025-09-04": ["Ch. 1", "Vocal anatomy", "📌 Lecture video on LMS (Ch1)","Summary note-taking"],
-        "2025-09-09": ["Ch. 2", "Phonetics & Phonology", "", "Summary note-taking"],
+        "2025-09-09": ["Ch. 1", "Sound description", "", "Summary note-taking"],
         "2025-09-11": ["Ch. 2", "Phonetics & Phonology", "", "Summary note-taking"],
-        "2025-09-16": ["", "", "", ""],
+        "2025-09-16": ["Ch. 3", "English consonants", "", "", ""],
         "2025-09-18": ["", "", "", ""],
         "2025-09-23": ["", "", "", ""],
         "2025-09-25": ["", "", "", ""],
