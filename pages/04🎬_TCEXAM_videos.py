@@ -2,8 +2,8 @@ import streamlit as st
 
 st.set_page_config(page_title="Past Exam Video Archive", layout="centered")
 
-st.title("English Linguistics Exam Video Archive")
-st.write(
+st.markdown("### 📗 English Linguistics Exam Video Archive")
+st.caption(
     "Select a year and exam session from the dropdown menu to view the corresponding video."
 )
 
