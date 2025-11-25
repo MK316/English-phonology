@@ -48,6 +48,7 @@ if 'button_clicked' not in st.session_state:
 st.markdown("### ⛄ 1. Words-by-stress")
 st.caption("Chapter 7. Stress; A total of 564 words")
 st.caption("Focus on learning the first word's details, and understand the variations as a reference.")
+st.markdown("[Error report](https://docs.google.com/spreadsheets/d/1luqWB2qoJ51QNyyLJ6AFUdhJw7d8oDyFsJFmPOsa5FM/edit?usp=sharing): If you find quesitonable item, report it on this Google Sheet.")
 selected_stress = st.selectbox("🔴 Select Stress Position", ["1st", "2nd", "antepenult", "penult", "ult", "compound"])
 
 # Display stress circles
