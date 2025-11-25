@@ -45,6 +45,21 @@ with tab1:
     # Audio player
     st.audio(selected_url, format="audio/mp3")
 
+    # Text
+    st.markdown("""
+    1. democrat - democracy - democratic
+
+    2. origin - original - originality
+
+    3. constitute - constitutional - constitutionality
+
+    4. photograph - photography - photographic
+
+    5. diplomat - diplomacy - diplomatic
+
+    
+
+    """)
 # ---------------------------
 # TAB 2: Placeholder
 # ---------------------------
