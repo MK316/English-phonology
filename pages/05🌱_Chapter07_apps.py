@@ -26,8 +26,8 @@ with tab1:
 
     # Dictionary of files: label -> full URL
     audio_files = {
-        "Audio 1": BASE_URL + "01_democrat.mp3",
-        "Audio 2": BASE_URL + "02_democrat_male.mp3",
+        "Audio 1: democrat (Female)": BASE_URL + "01_democrat.mp3",
+        "Audio 2: democrat (Male)": BASE_URL + "02_democrat_male.mp3",
         # Add more later if needed:
         # "Audio 3": BASE_URL + "audio3.mp3",
     }
