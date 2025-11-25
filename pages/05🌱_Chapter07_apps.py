@@ -22,7 +22,7 @@ with tab1:
     # Base URL where your MP3 files are stored on GitHub
     # Example pattern:
     # https://raw.githubusercontent.com/USERNAME/REPO/BRANCH/path/to/audio/file.mp3
-    BASE_URL = "https://github.com/MK316/English-phonology/tree/main/pages/audio/"
+    BASE_URL = "https://raw.githubusercontent.com/MK316/English-phonology/main/pages/audio/"
 
     # Dictionary of files: label -> full URL
     audio_files = {
