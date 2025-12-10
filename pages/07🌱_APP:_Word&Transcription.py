@@ -130,7 +130,7 @@ def check_quiz_answer():
         st.session_state["quiz_finished"] = True
 
 # ---------- UI ----------
-st.title("🎧 Word & IPA Practice App")
+st.title("🎧 Word & Transcription Practice App")
 
 tab1, tab2, tab3 = st.tabs(
     ["1️⃣ Listening Practice", "2️⃣ Typing Practice", "3️⃣ Quiz (10 items)"]
