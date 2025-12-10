@@ -175,7 +175,7 @@ with tab1:
 
 # ===== TAB 2 =====
 with tab2:
-    st.subheader("Typing Practice (Listen & Type the Word)")
+    st.subheader("Transcription Reading Practice")
     c1, c2 = st.columns(2)
     with c1:
         st.number_input(
