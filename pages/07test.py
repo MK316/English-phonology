@@ -86,14 +86,25 @@ def check_tab2_answer():
 
 # ---------- quiz helpers ----------
 def start_quiz():
-    n = min(10, len(df))
-    subset = df.sample(n).reset_index(drop=True)
+    # Read settings from widgets in Tab 3
+    n = st.session_state.get("tab3_n", 10)
+    order = st.session_state.get("tab3_order", "Random")
+
+    # Keep n within bounds
+    n = max(1, min(int(n), len(df)))
+
+    if order == "Random":
+        subset = df.sample(n).reset_index(drop=True)
+    else:  # WID order
+        subset = df.sort_values("WID").head(n).reset_index(drop=True)
+
     st.session_state["quiz_subset"] = subset
     st.session_state["quiz_idx"] = 0
     st.session_state["quiz_score"] = 0
     st.session_state["quiz_answer"] = ""
     st.session_state["quiz_feedback"] = ""
     st.session_state["quiz_finished"] = False
+
 
 def check_quiz_answer():
     subset = st.session_state.get("quiz_subset")
@@ -216,12 +227,31 @@ with tab2:
 
 # ===== TAB 3 =====
 with tab3:
-    st.subheader("Quiz: Type the Word from the Transcription (ten random items)")
+    st.subheader("Quiz: Type the Word from the Transcription")
 
-    if "quiz_subset" not in st.session_state or st.session_state.get("quiz_finished", False):
-        st.button("Start Quiz / Practice More", on_click=start_quiz,
-                  key="quiz_start")
+    # --- length & order selection (same style as tab1 & tab2) ---
+    c1, c2 = st.columns(2)
+    with c1:
+        st.number_input(
+            "Number of quiz items",
+            min_value=1,
+            max_value=len(df),
+            value=10,
+            step=1,
+            key="tab3_n",
+        )
+    with c2:
+        st.radio(
+            "Order",
+            options=["Random", "WID order"],
+            index=0,
+            key="tab3_order",
+        )
 
+    # Start / restart quiz using current settings
+    st.button("Start Quiz / Restart", on_click=start_quiz, key="quiz_start")
+
+    # --- main quiz logic ---
     if "quiz_subset" in st.session_state and not st.session_state.get("quiz_finished", False):
         subset = st.session_state["quiz_subset"]
         idx = st.session_state.get("quiz_idx", 0)
@@ -237,8 +267,7 @@ with tab3:
             key="quiz_answer",
             placeholder="Enter the word",
         )
-        st.button("Submit", on_click=check_quiz_answer,
-                  key="quiz_submit")
+        st.button("Submit", on_click=check_quiz_answer, key="quiz_submit")
 
         feedback = st.session_state.get("quiz_feedback", "")
         if feedback:
@@ -248,5 +277,4 @@ with tab3:
         subset = st.session_state["quiz_subset"]
         score = st.session_state.get("quiz_score", 0)
         st.success(f"🎉 Quiz finished! Final score: {score} / {len(subset)}")
-        st.button("Practice More", on_click=start_quiz,
-                  key="quiz_more")
+        st.button("Practice More", on_click=start_quiz, key="quiz_more")
