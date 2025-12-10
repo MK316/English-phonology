@@ -133,7 +133,7 @@ def check_quiz_answer():
 st.title("🎧 Word & Transcription Practice App")
 
 tab1, tab2, tab3 = st.tabs(
-    ["1️⃣ Listening Practice", "2️⃣ Typing Practice", "3️⃣ Quiz (10 items)"]
+    ["1️⃣ Listening Practice", "2️⃣ Transcription Reading", "3️⃣ Quiz"]
 )
 
 # ===== TAB 1 =====
