@@ -10,7 +10,7 @@ from reportlab.pdfgen import canvas
 
 st.set_page_config(page_title="Word & Transcription Practice App", layout="wide")
 
-# ---- CHANGE THIS TO YOUR RAW CSV URL ----
+# ---- CSV URL ----
 CSV_URL = "https://raw.githubusercontent.com/MK316/English-phonology/refs/heads/main/data/Stress-wordlist-2025.csv"
 
 @st.cache_data
@@ -29,15 +29,20 @@ def tts_audio(word: str) -> bytes:
 df = load_data()
 
 # ---------- PDF helper ----------
-def create_pdf_report(username, subset_df, score, start_time, end_time):
-    """Create a PDF report and return it as bytes."""
+def create_pdf_report(username, history, score, start_time, end_time):
+    """
+    Create a PDF report and return it as bytes.
+    history: list of dicts with keys {'word', 'correct'}.
+    """
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)
     width, height = A4
 
     y = height - 50
+
+    # Title
     c.setFont("Helvetica-Bold", 16)
-    c.drawString(50, y, "Word & Transcription Quiz Report")
+    c.drawString(50, y, "Word Quiz Report")
     y -= 30
 
     c.setFont("Helvetica", 11)
@@ -50,7 +55,8 @@ def create_pdf_report(username, subset_df, score, start_time, end_time):
         c.drawString(50, y, f"End time: {end_time.strftime('%Y-%m-%d %H:%M:%S')}")
         y -= 18
 
-    c.drawString(50, y, f"Score: {score} / {len(subset_df)}")
+    total_items = len(history)
+    c.drawString(50, y, f"Score: {score} / {total_items}")
     y -= 30
 
     c.setFont("Helvetica-Bold", 12)
@@ -58,9 +64,10 @@ def create_pdf_report(username, subset_df, score, start_time, end_time):
     y -= 20
 
     c.setFont("Helvetica", 10)
-    for i, row in subset_df.iterrows():
-        line = f"{i + 1}. {row['Word']}  -  {row['Transcription']}"
-        if y < 50:  # new page if we are running out of space
+    for i, item in enumerate(history, start=1):
+        status = "Correct" if item["correct"] else "Incorrect"
+        line = f"{i}. {item['word']}  -  {status}"
+        if y < 50:  # new page if needed
             c.showPage()
             y = height - 50
             c.setFont("Helvetica", 10)
@@ -152,30 +159,52 @@ def start_quiz():
     st.session_state["quiz_answer"] = ""
     st.session_state["quiz_feedback"] = ""
     st.session_state["quiz_finished"] = False
-    # record start time and freeze current username
+    st.session_state["quiz_history"] = []  # store per-item results
+    # record time & username snapshot
     st.session_state["quiz_start_time"] = datetime.now()
     st.session_state["quiz_end_time"] = None
-    st.session_state["quiz_username_stored"] = st.session_state.get(
-        "quiz_username", ""
-    ).strip() or "Anonymous"
+    st.session_state["quiz_username_stored"] = (
+        st.session_state.get("quiz_username", "").strip() or "Anonymous"
+    )
 
 def check_quiz_answer():
     subset = st.session_state.get("quiz_subset")
     idx = st.session_state.get("quiz_idx", 0)
     if subset is None:
         return
+
     user = st.session_state.get("quiz_answer", "").strip().lower()
-    correct = subset.iloc[idx]["Word"].strip().lower()
+    correct_word = subset.iloc[idx]["Word"].strip().lower()
+
     if not user:
         st.session_state["quiz_feedback"] = "Please type an answer."
         return
-    if user == correct:
+
+    is_correct = user == correct_word
+
+    if is_correct:
         st.session_state["quiz_score"] += 1
         st.session_state["quiz_feedback"] = "✅ Correct!"
     else:
         st.session_state["quiz_feedback"] = (
             f"❌ Incorrect. Correct answer: **{subset.iloc[idx]['Word']}**"
         )
+
+    # Log result for this item (once)
+    history = st.session_state.get("quiz_history", [])
+    # avoid duplicate logging if user presses submit multiple times
+    already_logged = any(h["index"] == idx for h in history)
+    if not already_logged:
+        history.append(
+            {
+                "index": idx,
+                "word": subset.iloc[idx]["Word"],
+                "correct": is_correct,
+            }
+        )
+        st.session_state["quiz_history"] = history
+
+    # Move on or finish
     if st.session_state["quiz_idx"] < len(subset) - 1:
         st.session_state["quiz_idx"] += 1
         st.session_state["quiz_answer"] = ""
@@ -186,8 +215,8 @@ def check_quiz_answer():
 # ---------- UI ----------
 st.title("🎧 Word & Transcription Practice App")
 
-tab1, tab2, tab3 = st.tabs(
-    ["1️⃣ Listening Practice", "2️⃣ Transcription Reading", "3️⃣ Quiz"]
+tab1, tab2, tab3, tab4 = st.tabs(
+    ["1️⃣ Listening Practice", "2️⃣ Transcription Reading", "3️⃣ Quiz", "4️⃣ Word Lookup"]
 )
 
 # ===== TAB 1 =====
@@ -341,6 +370,7 @@ with tab3:
         stored_name = st.session_state.get("quiz_username_stored", "Anonymous")
         start_time = st.session_state.get("quiz_start_time", None)
         end_time = st.session_state.get("quiz_end_time", None)
+        history = st.session_state.get("quiz_history", [])
 
         st.success(f"🎉 Quiz finished! Final score: {score} / {len(subset)}")
 
@@ -353,14 +383,41 @@ with tab3:
                     start_quiz()
 
         with col_b:
-            # generate PDF bytes
-            pdf_bytes = create_pdf_report(
-                stored_name, subset, score, start_time, end_time
-            )
-            st.download_button(
-                "📄 Download PDF report",
-                data=pdf_bytes,
-                file_name=f"{stored_name.replace(' ', '_')}_quiz_report.pdf",
-                mime="application/pdf",
-                key="quiz_pdf",
-            )
+            if history:
+                pdf_bytes = create_pdf_report(
+                    stored_name, history, score, start_time, end_time
+                )
+                st.download_button(
+                    "📄 Download PDF report",
+                    data=pdf_bytes,
+                    file_name=f"{stored_name.replace(' ', '_')}_quiz_report.pdf",
+                    mime="application/pdf",
+                    key="quiz_pdf",
+                )
+            else:
+                st.info("No history recorded yet for this quiz session.")
+
+# ===== TAB 4 =====
+with tab4:
+    st.subheader("Word Lookup (Transcription + Audio)")
+
+    lookup_word = st.text_input(
+        "Type a word to look up",
+        key="lookup_word",
+        placeholder="e.g., resignation",
+    )
+
+    if st.button("Search", key="lookup_search"):
+        if not lookup_word.strip():
+            st.warning("Please type a word to search.")
+        else:
+            # case-insensitive match
+            mask = df["Word"].str.lower() == lookup_word.strip().lower()
+            if mask.any():
+                row = df[mask].iloc[0]
+                st.markdown(f"**Word:** {row['Word']}")
+                st.text(f"Transcription: {row['Transcription']}")
+                audio_bytes = tts_audio(row["Word"])
+                st.audio(audio_bytes, format="audio/mp3")
+            else:
+                st.error("Word not found in the list.")
