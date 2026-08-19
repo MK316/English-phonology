@@ -113,57 +113,57 @@ with tab2:
     with col2:
 
 
-    # (QR 이미지 코드 삭제됨)
-    st.divider()
-    # --- Course overview ---
-    st.markdown("### 📝 Course overview")
-
-    overview_text = (
-        "This course introduces students to the study of English phonology, "
-        "the phonological grammar of English, and discusses why and how this "
-        "grammar is relevant to teaching English as a second or foreign language. "
-        "The course will cover basic concepts necessary to understand the sound "
-        "patterns of English from both descriptive and theoretical perspectives. "
-        "Students will learn the fundamentals of the English sound system and "
-        "acquire some characteristic phonological patterns of English to prepare "
-        "themselves as future English teachers. Additionally, the course will "
-        "include practice tests to familiarize students with the types of "
-        "questions commonly found on teaching licensure examinations."
-    )
-
-    st.markdown(f"""{overview_text}""")
-
-    @st.cache_data
-    def generate_tts_audio(text: str, lang: str = "en") -> bytes:
-        tts = gTTS(text=text, lang=lang)
-        audio_fp = io.BytesIO()
-        tts.write_to_fp(audio_fp)
-        audio_fp.seek(0)
-        return audio_fp.read()
-
-    audio_bytes = generate_tts_audio(overview_text)
-    # Click-to-play audio (no autoplay)
-    st.audio(audio_bytes, format="audio/mp3", start_time=0)
-
-    # --- Textbook & Software ---
-    st.markdown("### 📚 Textbook & Software")
-    tb, sw = st.columns(2)
-    with tb:
-        st.markdown(
-            """
-            **Textbook**  
-            Johnson, K. & Ladefoged, P. (2014). *A Course in Phonetics* (7th ed.). CENGAGE Learning.
-            """
+        # (QR 이미지 코드 삭제됨)
+        st.divider()
+        # --- Course overview ---
+        st.markdown("### 📝 Course overview")
+    
+        overview_text = (
+            "This course introduces students to the study of English phonology, "
+            "the phonological grammar of English, and discusses why and how this "
+            "grammar is relevant to teaching English as a second or foreign language. "
+            "The course will cover basic concepts necessary to understand the sound "
+            "patterns of English from both descriptive and theoretical perspectives. "
+            "Students will learn the fundamentals of the English sound system and "
+            "acquire some characteristic phonological patterns of English to prepare "
+            "themselves as future English teachers. Additionally, the course will "
+            "include practice tests to familiarize students with the types of "
+            "questions commonly found on teaching licensure examinations."
         )
-    with sw:
-        st.markdown(
-            """
-            **Software**  
-            Praat — download: <http://www.fon.hum.uva.nl/praat/download_win.html>
-            """
-        )
-
-    st.divider()
+    
+        st.markdown(f"""{overview_text}""")
+    
+        @st.cache_data
+        def generate_tts_audio(text: str, lang: str = "en") -> bytes:
+            tts = gTTS(text=text, lang=lang)
+            audio_fp = io.BytesIO()
+            tts.write_to_fp(audio_fp)
+            audio_fp.seek(0)
+            return audio_fp.read()
+    
+        audio_bytes = generate_tts_audio(overview_text)
+        # Click-to-play audio (no autoplay)
+        st.audio(audio_bytes, format="audio/mp3", start_time=0)
+    
+        # --- Textbook & Software ---
+        st.markdown("### 📚 Textbook & Software")
+        tb, sw = st.columns(2)
+        with tb:
+            st.markdown(
+                """
+                **Textbook**  
+                Johnson, K. & Ladefoged, P. (2014). *A Course in Phonetics* (7th ed.). CENGAGE Learning.
+                """
+            )
+        with sw:
+            st.markdown(
+                """
+                **Software**  
+                Praat — download: <http://www.fon.hum.uva.nl/praat/download_win.html>
+                """
+            )
+    
+        st.divider()
 
     # --- Evaluation table ---
     st.markdown("### ✅ Evaluation")
