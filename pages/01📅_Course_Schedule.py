@@ -98,7 +98,7 @@ with tab1:
 
 # ---------------- Tab 2: Syllabus / Course Info ----------------
 with tab2:
-    st.markdown("## 💦 **English Phonetics (Fall 2025)**")
+    st.markdown("## 💦 **English Phonology (Fall 2026)**")
     st.caption("Quick syllabus overview")
 
     # --- Top section: key facts + QR/link ---
@@ -108,10 +108,10 @@ with tab2:
         st.markdown(
             """
             **• Instructor:** Miran Kim (Professor, Rm# 301-316)  
-            **• Meeting Schedule:** Tuesdays (1–1:50 pm) & Thursdays (2–2:50 pm)  
+            **• Meeting Schedule:** Mondays (11–11:50 pm) & Thursdays (9–10:50 pm)  
             **• Digital classroom:** [MK316.github.io](https://MK316.github.io)  — course apps & resources  
             **• LMS:** rec.ac.kr/gnu  
-            **• Classroom:** 301-330  
+            **• Classroom:** 301-334  
             """,
         )
 
