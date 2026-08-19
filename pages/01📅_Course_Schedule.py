@@ -96,10 +96,7 @@ with tab2:
     st.markdown("## 💦 **English Phonology (Fall 2026)**")
     st.caption("Quick syllabus overview")
 
-    # --- Top section: key facts + QR/link ---
-    col1, col2 = st.columns([3, 2], vertical_alignment="top")
 
-    with col1:
         st.markdown(
             """
             **• Instructor:** Miran Kim (Professor, Rm# 301-316)  
@@ -110,14 +107,15 @@ with tab2:
             """,
         )
 
-    with col2:
+
+
 
 
         # (QR 이미지 코드 삭제됨)
-        st.divider()
+
         # --- Course overview ---
         st.markdown("### 📝 Course overview")
-    
+        st.divider()
         overview_text = (
             "This course introduces students to the study of English phonology, "
             "the phonological grammar of English, and discusses why and how this "
