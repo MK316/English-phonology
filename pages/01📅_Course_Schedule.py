@@ -14,7 +14,7 @@ with tab1:
     table_divider = "|------|---------|----------|---------------------------|--------|\n"
     
     # Start on Tuesday, September 2, 2025
-    start_date = datetime(2025, 9, 2)
+    start_date = datetime(2025, 9, 3)
     
     
     
