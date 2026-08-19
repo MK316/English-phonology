@@ -151,8 +151,8 @@ with tab2:
     with sw:
         st.markdown(
             """
-            **Software**  
-            Praat — download: <http://www.fon.hum.uva.nl/praat/download_win.html>
+            **TCE app**  
+            app link: <http://apps4u.streamlit.app>
             """
         )
 
