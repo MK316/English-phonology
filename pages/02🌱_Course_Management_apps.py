@@ -70,7 +70,7 @@ with tabs[1]:
 with tabs[2]:
     st.subheader("👥 Grouping Tool")
     st.caption("Your CSV should have at least the columns `Course` and `Name_ori`.")
-    default_url = "https://raw.githubusercontent.com/MK316/mk316files/refs/heads/main/roster/roster_fall26.csv"
+    default_url = "https://raw.githubusercontent.com/MK316/mk316files/refs/heads/main/roster/roster_fall26_0820.csv"
 #    st.markdown(f"[📎 Sample File: S25DL-roster.csv]({default_url})")
     uploaded_file = st.file_uploader("🌱 Step1: Upload your CSV file (optional)", type=["csv"])
     if uploaded_file is not None:
