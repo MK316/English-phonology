@@ -96,78 +96,73 @@ with tab2:
     st.markdown("## 💦 **English Phonology (Fall 2026)**")
     st.caption("Quick syllabus overview")
 
+    st.markdown(
+        """
+        **• Instructor:** Miran Kim (Professor, Rm# 301-316)  
+        **• Meeting Schedule:** Mondays (11–11:50 pm) & Thursdays (9–10:50 pm)  
+        **• Digital classroom:** [MK316.github.io](https://MK316.github.io)  — course apps & resources  
+        **• LMS:** rec.ac.kr/gnu  
+        **• Classroom:** 301-334  
+        """,
+    )
 
+    # (QR 이미지 코드 삭제됨)
+
+    # --- Course overview ---
+    st.markdown("### 📝 Course overview")
+    st.divider()
+    overview_text = (
+        "This course introduces students to the study of English phonology, "
+        "the phonological grammar of English, and discusses why and how this "
+        "grammar is relevant to teaching English as a second or foreign language. "
+        "The course will cover basic concepts necessary to understand the sound "
+        "patterns of English from both descriptive and theoretical perspectives. "
+        "Students will learn the fundamentals of the English sound system and "
+        "acquire some characteristic phonological patterns of English to prepare "
+        "themselves as future English teachers. Additionally, the course will "
+        "include practice tests to familiarize students with the types of "
+        "questions commonly found on teaching licensure examinations."
+    )
+
+    st.markdown(f"""{overview_text}""")
+
+    @st.cache_data
+    def generate_tts_audio(text: str, lang: str = "en") -> bytes:
+        tts = gTTS(text=text, lang=lang)
+        audio_fp = io.BytesIO()
+        tts.write_to_fp(audio_fp)
+        audio_fp.seek(0)
+        return audio_fp.read()
+
+    audio_bytes = generate_tts_audio(overview_text)
+    # Click-to-play audio (no autoplay)
+    st.audio(audio_bytes, format="audio/mp3", start_time=0)
+
+    # --- Textbook & Software ---
+    st.markdown("### 📚 Textbook & Software")
+    tb, sw = st.columns(2)
+    with tb:
         st.markdown(
             """
-            **• Instructor:** Miran Kim (Professor, Rm# 301-316)  
-            **• Meeting Schedule:** Mondays (11–11:50 pm) & Thursdays (9–10:50 pm)  
-            **• Digital classroom:** [MK316.github.io](https://MK316.github.io)  — course apps & resources  
-            **• LMS:** rec.ac.kr/gnu  
-            **• Classroom:** 301-334  
-            """,
+            **Textbook**  
+            Johnson, K. & Ladefoged, P. (2014). *A Course in Phonetics* (7th ed.). CENGAGE Learning.
+            """
+        )
+    with sw:
+        st.markdown(
+            """
+            **Software**  
+            Praat — download: <http://www.fon.hum.uva.nl/praat/download_win.html>
+            """
         )
 
-
-
-
-
-        # (QR 이미지 코드 삭제됨)
-
-        # --- Course overview ---
-        st.markdown("### 📝 Course overview")
-        st.divider()
-        overview_text = (
-            "This course introduces students to the study of English phonology, "
-            "the phonological grammar of English, and discusses why and how this "
-            "grammar is relevant to teaching English as a second or foreign language. "
-            "The course will cover basic concepts necessary to understand the sound "
-            "patterns of English from both descriptive and theoretical perspectives. "
-            "Students will learn the fundamentals of the English sound system and "
-            "acquire some characteristic phonological patterns of English to prepare "
-            "themselves as future English teachers. Additionally, the course will "
-            "include practice tests to familiarize students with the types of "
-            "questions commonly found on teaching licensure examinations."
-        )
-    
-        st.markdown(f"""{overview_text}""")
-    
-        @st.cache_data
-        def generate_tts_audio(text: str, lang: str = "en") -> bytes:
-            tts = gTTS(text=text, lang=lang)
-            audio_fp = io.BytesIO()
-            tts.write_to_fp(audio_fp)
-            audio_fp.seek(0)
-            return audio_fp.read()
-    
-        audio_bytes = generate_tts_audio(overview_text)
-        # Click-to-play audio (no autoplay)
-        st.audio(audio_bytes, format="audio/mp3", start_time=0)
-    
-        # --- Textbook & Software ---
-        st.markdown("### 📚 Textbook & Software")
-        tb, sw = st.columns(2)
-        with tb:
-            st.markdown(
-                """
-                **Textbook**  
-                Johnson, K. & Ladefoged, P. (2014). *A Course in Phonetics* (7th ed.). CENGAGE Learning.
-                """
-            )
-        with sw:
-            st.markdown(
-                """
-                **Software**  
-                Praat — download: <http://www.fon.hum.uva.nl/praat/download_win.html>
-                """
-            )
-    
-        st.divider()
+    st.divider()
 
     # --- Evaluation table ---
     st.markdown("### ✅ Evaluation")
     data = [
         ["Attendance & class participation", "10%", "Unexcused absence (−1); late check-in (−0.2)"],
-        ["Quizzes", "30%", "TBA"],
+        ["Quizzes", "40%", "TBA"],
         ["Exam", "40%", "Final exam"],
         ["Assignments", "10%", "Group activities: Exercises (5), Transcription (5)"],
         ["Summary notes", "10%", "All chapters (will be checked 3 times)"],
