@@ -4,5 +4,5 @@ img = "https://github.com/MK316/english-phonology/raw/main/pages/images/bg01.png
 
 col1, col2, col3 = st.columns([0.5, 3, 0.5])
 with col2:
-    st.markdown("### 🍰 Fall 2025")
+    st.markdown("### 🍰 Fall 2026")
     st.image(img, use_container_width=True)  # or: width=400
