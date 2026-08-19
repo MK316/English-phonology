@@ -7,7 +7,7 @@ st.title("📘 Course Overview")
 
 tab1, tab2, tab3 = st.tabs(["Schedule", "Syllabus", "TBA"])
 
-with tabs[1]:
+with tab1:
     # Start on Thursday, September 3, 2026 (course meets Mondays & Thursdays)
     start_date = datetime(2026, 9, 3)
 
