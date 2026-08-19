@@ -97,7 +97,9 @@ with tabs[2]:
             if total_students == 0:
                 st.error(f"❗ No students found in {selected_course}.")
             else:
-                num_groups = -(-total_students // group_size)  # ceil division
+                # Use floor division so the remainder gets folded into the last group
+                # instead of forming its own small (or single-member) group.
+                num_groups = max(1, total_students // group_size)
                 grouped_data = []
                 pos = 0
                 for group_num in range(1, num_groups + 1):
@@ -105,7 +107,7 @@ with tabs[2]:
                         members = names[pos:pos + group_size]
                         pos += group_size
                     else:
-                        # Last group takes whatever remains (e.g., 5 members)
+                        # Last group takes whatever remains (e.g., 5 if 21 students)
                         members = names[pos:]
                     grouped_data.append([f"Group {group_num}"] + members)
                 # Prepare final DataFrame
@@ -125,7 +127,6 @@ with tabs[2]:
                 )
     else:
         st.error("The file must contain both `Course` and `Name_ori` columns.")
-
 #--------Tab 3
 
 import streamlit as st
