@@ -7,17 +7,10 @@ st.title("📘 Course Overview")
 
 tab1, tab2, tab3 = st.tabs(["Schedule", "Syllabus", "TBA"])
 
-with tab1:
-
-    # Table header
-    table_header = "| Date | Chapter | Keywords | Assignments & Activities | Remark |\n"
-    table_divider = "|------|---------|----------|---------------------------|--------|\n"
-    
+with tabs[1]:
     # Start on Thursday, September 3, 2026 (course meets Mondays & Thursdays)
     start_date = datetime(2026, 9, 3)
-    
-    
-    
+
     # ✅ STEP 1: Fill only the weeks you want — here, Week 3 has data (Sept. 16 & 18)
     schedule_content = {
         "2026-09-03": ["Ch. 1", "Syllabus, Course overview", "Grouping", "Reading Chapter 1"],
@@ -53,11 +46,10 @@ with tab1:
         "2026-12-17": ["", "", "", ""],
         "2026-12-21": ["", "", "", "🔴 Final exam"]
     }
-    
 
-    # ✅ STEP 2: Build the markdown table
-    table_rows = ""
-    for date_str, content in schedule_content.items():
+    # ✅ STEP 2: Build the HTML table (Week 1-16, Thursday rows highlighted light blue)
+    table_rows_html = ""
+    for i, (date_str, content) in enumerate(schedule_content.items()):
         date_obj = datetime.strptime(date_str, "%Y-%m-%d")
         display_date = date_obj.strftime("%b %d (%a)")  # e.g., "Sep 03 (Thu)"
 
@@ -65,15 +57,37 @@ with tab1:
         row = (content + ["", "", "", ""])[:4]
         chapter, keywords, assignments, remark = row
 
-        table_rows += f"| {display_date} | {chapter} | {keywords} | {assignments} | {remark} |\n"
+        # Week number: two sessions (Mon/Thu) per week -> Week 1 to 16
+        week_num = (i // 2) + 1
 
-    schedule_table = table_header + table_divider + table_rows
+        # Highlight Thursday rows in light blue
+        is_thursday = date_obj.strftime("%A") == "Thursday"
+        row_style = ' style="background-color:#ADD8E6;"' if is_thursday else ""
 
-    st.markdown(schedule_table)
+        table_rows_html += (
+            f"<tr{row_style}>"
+            f"<td>{week_num}</td>"
+            f"<td>{display_date}</td>"
+            f"<td>{chapter}</td>"
+            f"<td>{keywords}</td>"
+            f"<td>{assignments}</td>"
+            f"<td>{remark}</td>"
+            f"</tr>\n"
+        )
+
+    table_header_html = (
+        "<table>"
+        "<tr>"
+        "<th>Week</th><th>Date</th><th>Chapter</th><th>Keywords</th>"
+        "<th>Assignments & Activities</th><th>Remark</th>"
+        "</tr>\n"
+    )
+    table_footer_html = "</table>"
+
+    schedule_table = table_header_html + table_rows_html + table_footer_html
+
     # ✅ STEP 3: Display it
-    st.markdown(table_md, unsafe_allow_html=True)
-
-
+    st.markdown(schedule_table, unsafe_allow_html=True)
 
 # ---------------- Tab 2: Syllabus / Course Info ----------------
 with tab2:
