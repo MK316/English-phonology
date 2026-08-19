@@ -13,16 +13,6 @@ with tab1:
     table_header = "| Date | Chapter | Keywords | Assignments & Activities | Remark |\n"
     table_divider = "|------|---------|----------|---------------------------|--------|\n"
     
-    # Start on Tuesday, September 2, 2025
-    start_date = datetime(2025, 9, 3)
-    
-    
-    
-with tabs[1]:
-    # Table header
-    table_header = "| Date | Chapter | Keywords | Assignments & Activities | Remark |\n"
-    table_divider = "|------|---------|----------|---------------------------|--------|\n"
-    
     # Start on Thursday, September 3, 2026 (course meets Mondays & Thursdays)
     start_date = datetime(2026, 9, 3)
     
