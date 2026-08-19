@@ -1,6 +1,8 @@
 import streamlit as st
 from datetime import datetime, timedelta
 import pandas as pd
+from gtts import gTTS
+import io
 
 st.set_page_config(page_title="📘 16-Week Course Schedule", layout="wide")
 st.title("📘 Course Overview")
@@ -109,28 +111,39 @@ with tab2:
         )
 
     with col2:
-        QR_URL = "https://github.com/MK316/english-phonetics/raw/main/pages/images/qr_phonetics.png"
-        st.image(QR_URL, caption="Digital classroom QR", width=150)  # set width in pixels
-    st.divider()
 
+
+    # (QR 이미지 코드 삭제됨)
+    st.divider()
     # --- Course overview ---
     st.markdown("### 📝 Course overview")
-    st.markdown(
-        """
-        This course introduces the fundamental aspects of the English sound system with an emphasis on
-        learning and teaching English pronunciation. We cover the basic phonetic properties of English
-        speech sounds—**consonants and vowels**—and core concepts needed to understand the sound system.
-        We also explore **English prosody** (syllables, rhythm, and intonation).
 
-        You will practice **phonetic transcription** of spoken English data and develop skills for teaching
-        pronunciation. Throughout the course, you’ll learn to distinguish **connected vs. isolated speech** and
-        **formal vs. informal** styles.
-        """
+    overview_text = (
+        "This course introduces students to the study of English phonology, "
+        "the phonological grammar of English, and discusses why and how this "
+        "grammar is relevant to teaching English as a second or foreign language. "
+        "The course will cover basic concepts necessary to understand the sound "
+        "patterns of English from both descriptive and theoretical perspectives. "
+        "Students will learn the fundamentals of the English sound system and "
+        "acquire some characteristic phonological patterns of English to prepare "
+        "themselves as future English teachers. Additionally, the course will "
+        "include practice tests to familiarize students with the types of "
+        "questions commonly found on teaching licensure examinations."
     )
-    AUDIO_URL = "https://raw.githubusercontent.com/MK316/english-phonetics/main/pages/audio/audio-overview.mp3"
 
+    st.markdown(f"""{overview_text}""")
+
+    @st.cache_data
+    def generate_tts_audio(text: str, lang: str = "en") -> bytes:
+        tts = gTTS(text=text, lang=lang)
+        audio_fp = io.BytesIO()
+        tts.write_to_fp(audio_fp)
+        audio_fp.seek(0)
+        return audio_fp.read()
+
+    audio_bytes = generate_tts_audio(overview_text)
     # Click-to-play audio (no autoplay)
-    st.audio(AUDIO_URL, format="audio/mp3", start_time=0)
+    st.audio(audio_bytes, format="audio/mp3", start_time=0)
 
     # --- Textbook & Software ---
     st.markdown("### 📚 Textbook & Software")
