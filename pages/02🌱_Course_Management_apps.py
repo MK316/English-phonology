@@ -84,47 +84,124 @@ with tabs[2]:
         # Step 1: Select Course
         course_list = df['Course'].dropna().unique().tolist()
         selected_course = st.selectbox("🌱 Step 2: Select Course for Grouping", course_list)
+
+        SPECIAL_COURSE = '디지털리터러시와영어교육'
+        is_special = (selected_course == SPECIAL_COURSE) and ('Year' in df.columns)
+
         # Step 2: Group size info
-        st.markdown("##### 🌱 Step3: Group Settings (4 members per group; the last group takes the remainder)")
+        if is_special:
+            st.markdown("##### 🌱 Step3: Group Settings (4 members per group; last group takes the remainder; "
+                         "each group has 1–2 second-year students)")
+        else:
+            st.markdown("##### 🌱 Step3: Group Settings (4 members per group; the last group takes the remainder)")
+
         if st.button("🌱 Step 4: Generate Groups"):
             # Filter by course
             course_df = df[df['Course'] == selected_course]
-            names = course_df['Name_ori'].dropna().tolist()
-            random.shuffle(names)
-
             group_size = 4
-            total_students = len(names)
-            if total_students == 0:
-                st.error(f"❗ No students found in {selected_course}.")
-            else:
-                # Use floor division so the remainder gets folded into the last group
-                # instead of forming its own small (or single-member) group.
+            grouped_data = []
+
+            if is_special:
+                # --- Year-aware grouping for 디지털리터러시와영어교육 ---
+                try:
+                    course_df = course_df.copy()
+                    course_df['Year'] = course_df['Year'].astype(int)
+                except Exception:
+                    st.error("❗ The `Year` column must contain integer values (1 or 2).")
+                    st.stop()
+
+                year1 = course_df.loc[course_df['Year'] == 1, 'Name_ori'].dropna().tolist()
+                year2 = course_df.loc[course_df['Year'] == 2, 'Name_ori'].dropna().tolist()
+                total_students = len(year1) + len(year2)
+
+                if total_students == 0:
+                    st.error(f"❗ No students found in {selected_course}.")
+                    st.stop()
+
+                # Same floor-division rule: remainder folds into the last group
                 num_groups = max(1, total_students // group_size)
-                grouped_data = []
+                n2 = len(year2)
+
+                # Each group must have 1 or 2 second-year students
+                if n2 < num_groups:
+                    st.error(
+                        f"❗ Only {n2} second-year students available, but {num_groups} groups need "
+                        f"at least 1 each. Not enough second-year students for this grouping."
+                    )
+                    st.stop()
+                if n2 > num_groups * 2:
+                    st.error(
+                        f"❗ {n2} second-year students is too many for {num_groups} groups "
+                        f"(max 2 per group). Consider adjusting the roster."
+                    )
+                    st.stop()
+
+                random.shuffle(year1)
+                random.shuffle(year2)
+
+                # Target overall size per group (4 each, last group absorbs remainder)
+                group_target_sizes = [group_size] * (num_groups - 1)
+                group_target_sizes.append(total_students - group_size * (num_groups - 1))
+
+                groups = [[] for _ in range(num_groups)]
+
+                # Distribute 2nd-years round-robin, 1 or 2 per group
+                base, extra = divmod(n2, num_groups)
+                idx = 0
+                for g in range(num_groups):
+                    take = base + (1 if g < extra else 0)
+                    for _ in range(take):
+                        groups[g].append(year2[idx])
+                        idx += 1
+
+                # Fill remaining slots per group with 1st-years
+                idx = 0
+                for g in range(num_groups):
+                    remaining = group_target_sizes[g] - len(groups[g])
+                    groups[g].extend(year1[idx:idx + remaining])
+                    idx += remaining
+
+                for grp in groups:
+                    random.shuffle(grp)
+
+                for i, grp in enumerate(groups, start=1):
+                    grouped_data.append([f"Group {i}"] + grp)
+
+            else:
+                # --- Standard grouping (no Year constraint) ---
+                names = course_df['Name_ori'].dropna().tolist()
+                random.shuffle(names)
+
+                total_students = len(names)
+                if total_students == 0:
+                    st.error(f"❗ No students found in {selected_course}.")
+                    st.stop()
+
+                num_groups = max(1, total_students // group_size)
                 pos = 0
                 for group_num in range(1, num_groups + 1):
                     if group_num < num_groups:
                         members = names[pos:pos + group_size]
                         pos += group_size
                     else:
-                        # Last group takes whatever remains (e.g., 5 if 21 students)
                         members = names[pos:]
                     grouped_data.append([f"Group {group_num}"] + members)
-                # Prepare final DataFrame
-                max_members = max(len(group) - 1 for group in grouped_data)
-                columns = ['Group'] + [f'Member{i+1}' for i in range(max_members)]
-                grouped_df = pd.DataFrame(grouped_data, columns=columns)
-                st.success(f"✅ {selected_course}: Grouping complete!")
-                st.write(grouped_df)
-                # Download button
-                csv_buffer = io.StringIO()
-                grouped_df.to_csv(csv_buffer, index=False)
-                st.download_button(
-                    label="📥 Download Grouped CSV",
-                    data=csv_buffer.getvalue().encode('utf-8'),
-                    file_name=f"grouped_{selected_course.replace(' ', '_')}.csv",
-                    mime="text/csv"
-                )
+
+            # Prepare final DataFrame
+            max_members = max(len(group) - 1 for group in grouped_data)
+            columns = ['Group'] + [f'Member{i+1}' for i in range(max_members)]
+            grouped_df = pd.DataFrame(grouped_data, columns=columns)
+            st.success(f"✅ {selected_course}: Grouping complete!")
+            st.write(grouped_df)
+            # Download button
+            csv_buffer = io.StringIO()
+            grouped_df.to_csv(csv_buffer, index=False)
+            st.download_button(
+                label="📥 Download Grouped CSV",
+                data=csv_buffer.getvalue().encode('utf-8'),
+                file_name=f"grouped_{selected_course.replace(' ', '_')}.csv",
+                mime="text/csv"
+            )
     else:
         st.error("The file must contain both `Course` and `Name_ori` columns.")
 #--------Tab 3
