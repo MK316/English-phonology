@@ -18,79 +18,68 @@ with tab1:
     
     
     
+with tabs[1]:
+    # Table header
+    table_header = "| Date | Chapter | Keywords | Assignments & Activities | Remark |\n"
+    table_divider = "|------|---------|----------|---------------------------|--------|\n"
+    
+    # Start on Thursday, September 3, 2026 (course meets Mondays & Thursdays)
+    start_date = datetime(2026, 9, 3)
+    
+    
+    
     # ✅ STEP 1: Fill only the weeks you want — here, Week 3 has data (Sept. 16 & 18)
     schedule_content = {
-        "2025-09-03": ["Ch. 1", "Syllabus, Course overview", "Grouping", "Reading Chapter 1"],
-        "2025-09-07": ["Ch. 1", "Phonetics review", "Reading","Summary note-taking"],
-        "2025-09-10": ["Ch. 1", "Sound description", "", "Summary note-taking"],
-        "2025-09-14": ["Ch. 2", "Phonetics & Phonology", "", "Summary note-taking"],
-        "2025-09-17": ["Ch. 3", "English consonants", "", "", ""],
-        "2025-09-21": ["", "", "", ""],
-        "2025-09-24": ["🎈Holiday", "", "", ""],
-        "2025-09-28": ["", "", "", ""],
-        "2025-10-01": ["", "", "", ""],
-        "2025-10-05": ["🎈Alt Holiday", "", "", "🔴 "],
-        "2025-10-07": ["", "", "", ""],
-        "2025-10-08": ["", "", "", ""],
-        "2025-10-12": ["", "", "", ""],
-        "2025-10-15": ["", "", "", ""],
-        "2025-10-19": ["", "", "", ""],
-        "2025-10-22": ["", "", "", ""],
-        "2025-10-26": ["", "", "", ""],
-        "2025-10-29": ["", "", "", ""],
-        "2025-11-02": ["", "", "", ""],
-        "2025-11-05": ["", "", "", ""],
-        "2025-11-09": ["", "", "", ""],
-        "2025-11-12": ["", "", "", ""],
-        "2025-11-16": ["", "", "", ""],
-        "2025-11-19": ["", "", "", "🔴 "],
-        "2025-11-23": ["", "", "", ""],
-        "2025-11-26": ["", "", "", ""],
-        "2025-11-30": ["", "", "", ""],
-        "2025-12-03": ["", "", "", ""],
-        "2025-12-07": ["", "", "", ""],
-        "2025-12-10": ["", "", "", ""],
-        "2025-12-14": ["", "", "", ""],
-        "2025-12-17": ["", "", "", "🔴 Final exam"]
+        "2026-09-03": ["Ch. 1", "Syllabus, Course overview", "Grouping", "Reading Chapter 1"],
+        "2026-09-07": ["Ch. 1", "Phonetics review", "Reading", "Summary note-taking"],
+        "2026-09-10": ["Ch. 1", "Sound description", "", "Summary note-taking"],
+        "2026-09-14": ["Ch. 2", "Phonetics & Phonology", "", "Summary note-taking"],
+        "2026-09-17": ["Ch. 3", "English consonants", "", "", ""],
+        "2026-09-21": ["", "", "", ""],
+        "2026-09-24": ["🎈Holiday", "", "", ""],
+        "2026-09-28": ["", "", "", ""],
+        "2026-10-01": ["", "", "", ""],
+        "2026-10-05": ["🎈Alt Holiday", "", "", "🔴 "],
+        "2026-10-08": ["", "", "", ""],
+        "2026-10-12": ["", "", "", ""],
+        "2026-10-15": ["", "", "", ""],
+        "2026-10-19": ["", "", "", ""],
+        "2026-10-22": ["", "", "", ""],
+        "2026-10-26": ["", "", "", ""],
+        "2026-10-29": ["", "", "", ""],
+        "2026-11-02": ["", "", "", ""],
+        "2026-11-05": ["", "", "", ""],
+        "2026-11-09": ["", "", "", ""],
+        "2026-11-12": ["", "", "", ""],
+        "2026-11-16": ["", "", "", ""],
+        "2026-11-19": ["", "", "", ""],
+        "2026-11-23": ["", "", "", "🔴 "],
+        "2026-11-26": ["", "", "", ""],
+        "2026-11-30": ["", "", "", ""],
+        "2026-12-03": ["", "", "", ""],
+        "2026-12-07": ["", "", "", ""],
+        "2026-12-10": ["", "", "", ""],
+        "2026-12-14": ["", "", "", ""],
+        "2026-12-17": ["", "", "", ""],
+        "2026-12-21": ["", "", "", "🔴 Final exam"]
     }
     
-    # ✅ STEP 2: Build the markdown table
-    table_md = ""
-    
-    table_md = ""
-    
-    for week in range(16):
-        # --- choose emoji/tag first ---
-        if 7 <= (week + 1) <= 11:
-            emoji, tag = "💙", " (Academic trip) 〽️ 〽️ 〽️ 〽️ 〽️ 〽️ 〽️"
-        else:
-            emoji, tag = "🗓️", ""
-    
-        # --- label & header (once) ---
-        week_label = f"**{emoji} Week {week + 1:02d}{tag}**"
-        table_md += f"\n{week_label}\n\n"
-        table_md += table_header + table_divider
-    
-        # --- dates for this week ---
-        tuesday  = start_date + timedelta(weeks=week)
-        thursday = tuesday + timedelta(days=2)
-    
-        # --- format date (red for Oct 7 & 9 only) ---
-        def format_date(d):
-            s = d.strftime("%Y-%m-%d")
-            if s in ("2025-10-07", "2025-10-09"):
-                return f"<span style='color:red'>{d.strftime('%b. %d')}</span>"
-            return d.strftime("%b. %d")
-    
-        # --- fetch content once for each date ---
-        tue_data = schedule_content.get(tuesday.strftime("%Y-%m-%d"),  ["", "", "", ""])
-        thu_data = schedule_content.get(thursday.strftime("%Y-%m-%d"), ["", "", "", ""])
-    
-        # --- append EXACTLY TWO ROWS (do not append anywhere else) ---
-        table_md += f"| {format_date(tuesday)}  | {tue_data[0]} | {tue_data[1]} | {tue_data[2]} | {tue_data[3]} |\n"
-        table_md += f"| {format_date(thursday)} | {thu_data[0]} | {thu_data[1]} | {thu_data[2]} | {thu_data[3]} |\n"
-    
 
+    # ✅ STEP 2: Build the markdown table
+    table_rows = ""
+    for date_str, content in schedule_content.items():
+        date_obj = datetime.strptime(date_str, "%Y-%m-%d")
+        display_date = date_obj.strftime("%b %d (%a)")  # e.g., "Sep 03 (Thu)"
+
+        # Pad content to always have 4 columns: Chapter, Keywords, Assignments, Remark
+        row = (content + ["", "", "", ""])[:4]
+        chapter, keywords, assignments, remark = row
+
+        table_rows += f"| {display_date} | {chapter} | {keywords} | {assignments} | {remark} |\n"
+
+    schedule_table = table_header + table_divider + table_rows
+
+    st.markdown(schedule_table)
     # ✅ STEP 3: Display it
     st.markdown(table_md, unsafe_allow_html=True)
 
