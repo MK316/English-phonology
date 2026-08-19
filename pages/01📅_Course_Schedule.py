@@ -145,7 +145,7 @@ with tab2:
         st.markdown(
             """
             **Textbook**  
-            Johnson, K. & Ladefoged, P. (2014). *A Course in Phonetics* (7th ed.). CENGAGE Learning.
+            Applied English Phonology (4th edition) by Mehmet Yavaʂ (2020), Wiley Blackwell.
             """
         )
     with sw:
