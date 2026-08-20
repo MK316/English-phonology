@@ -116,7 +116,7 @@ with tab2:
     st.markdown("### ✅ Evaluation")
     data = [
         ["Attendance & class participation", "10%", "Unexcused absence (−1); late check-in (−0.2)"],
-        ["Quizzes", "40%", "TBA"],
+        ["Quizzes", "40%", "[quiz schedule](https://docs.google.com/spreadsheets/d/1PfywzAfzNer4iu1iZBXo54AHb1xYcvKi5dh10qzrzBU/edit?usp=sharing)"],
         ["Exam", "40%", "Final exam"],
         ["Assignments", "10%", "Group activities: Exercises (5), Transcription (5)"]
     ]
