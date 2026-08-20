@@ -88,17 +88,69 @@ with tabs[2]:
         SPECIAL_COURSE = '디지털리터러시와영어교육'
         is_special = (selected_course == SPECIAL_COURSE) and ('Year' in df.columns)
 
-        # Step 2: Group size info
+        # Step 2: Group size info / selection
         if is_special:
+            group_size = 4
             st.markdown("##### 🌱 Step3: Group Settings (4 members per group; last group takes the remainder; "
                          "each group has 1–2 second-year students)")
         else:
-            st.markdown("##### 🌱 Step3: Group Settings (4 members per group; the last group takes the remainder)")
+            group_size = st.radio(
+                "🌱 Step3: Choose Group Size",
+                options=[3, 4],
+                horizontal=True,
+            )
+            st.caption(
+                f"Group size: {group_size} members per group. "
+                "If 1 student remains, they join the last group. "
+                "If 2 students remain, they form a separate small group."
+            )
+
+        def distribute_standard(names, group_size):
+            """
+            Split `names` into groups of `group_size`.
+            - remainder == 0: all groups exactly `group_size`
+            - remainder == 1: folded into the last group (last group = group_size + 1)
+            - remainder == 2: kept as its own separate small group
+            - if there aren't enough members for even one full group,
+              everyone goes into a single group.
+            """
+            total = len(names)
+            if total == 0:
+                return []
+
+            base = total // group_size
+            remainder = total % group_size
+
+            if base == 0:
+                # Not enough members for a single full-size group
+                return [names]
+
+            groups = []
+            pos = 0
+
+            if remainder == 0:
+                for _ in range(base):
+                    groups.append(names[pos:pos + group_size])
+                    pos += group_size
+
+            elif remainder == 1:
+                # Build (base - 1) full groups, then fold remainder into the last group
+                for _ in range(base - 1):
+                    groups.append(names[pos:pos + group_size])
+                    pos += group_size
+                groups.append(names[pos:])  # last group gets group_size + 1 members
+
+            else:  # remainder == 2
+                for _ in range(base):
+                    groups.append(names[pos:pos + group_size])
+                    pos += group_size
+                groups.append(names[pos:])  # separate group of 2
+
+            return groups
 
         if st.button("🌱 Step 4: Generate Groups"):
             # Filter by course
             course_df = df[df['Course'] == selected_course]
-            group_size = 4
             grouped_data = []
 
             if is_special:
@@ -168,24 +220,18 @@ with tabs[2]:
                     grouped_data.append([f"Group {i}"] + grp)
 
             else:
-                # --- Standard grouping (no Year constraint) ---
+                # --- Standard grouping (user-selected group size, 3 or 4) ---
                 names = course_df['Name_ori'].dropna().tolist()
                 random.shuffle(names)
 
-                total_students = len(names)
-                if total_students == 0:
+                if len(names) == 0:
                     st.error(f"❗ No students found in {selected_course}.")
                     st.stop()
 
-                num_groups = max(1, total_students // group_size)
-                pos = 0
-                for group_num in range(1, num_groups + 1):
-                    if group_num < num_groups:
-                        members = names[pos:pos + group_size]
-                        pos += group_size
-                    else:
-                        members = names[pos:]
-                    grouped_data.append([f"Group {group_num}"] + members)
+                groups = distribute_standard(names, group_size)
+
+                for i, grp in enumerate(groups, start=1):
+                    grouped_data.append([f"Group {i}"] + grp)
 
             # Prepare final DataFrame
             max_members = max(len(group) - 1 for group in grouped_data)
