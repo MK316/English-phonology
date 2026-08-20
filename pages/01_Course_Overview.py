@@ -44,47 +44,6 @@ with tab1:
     st.markdown(button_html, unsafe_allow_html=True)
 
 
-    # ✅ STEP 2: Build the HTML table (Week 1-16, Thursday rows highlighted light blue)
-    table_rows_html = ""
-    for i, (date_str, content) in enumerate(schedule_content.items()):
-        date_obj = datetime.strptime(date_str, "%Y-%m-%d")
-        display_date = date_obj.strftime("%b %d (%a)")  # e.g., "Sep 03 (Thu)"
-
-        # Pad content to always have 4 columns: Chapter, Keywords, Assignments, Remark
-        row = (content + ["", "", "", ""])[:4]
-        chapter, keywords, assignments, remark = row
-
-        # Week number: two sessions (Mon/Thu) per week -> Week 1 to 16
-        week_num = (i // 2) + 1
-
-        # Highlight Thursday rows in light blue
-        is_thursday = date_obj.strftime("%A") == "Thursday"
-        row_style = ' style="background-color:#ADD8E6;"' if is_thursday else ""
-
-        table_rows_html += (
-            f"<tr{row_style}>"
-            f"<td>{week_num}</td>"
-            f"<td>{display_date}</td>"
-            f"<td>{chapter}</td>"
-            f"<td>{keywords}</td>"
-            f"<td>{assignments}</td>"
-            f"<td>{remark}</td>"
-            f"</tr>\n"
-        )
-
-    table_header_html = (
-        "<table>"
-        "<tr>"
-        "<th>Week</th><th>Date</th><th>Chapter</th><th>Keywords</th>"
-        "<th>Assignments & Activities</th><th>Remark</th>"
-        "</tr>\n"
-    )
-    table_footer_html = "</table>"
-
-    schedule_table = table_header_html + table_rows_html + table_footer_html
-
-    # ✅ STEP 3: Display it
-    st.markdown(schedule_table, unsafe_allow_html=True)
 
 # ---------------- Tab 2: Syllabus / Course Info ----------------
 with tab2:
