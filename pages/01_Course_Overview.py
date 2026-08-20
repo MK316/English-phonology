@@ -22,7 +22,7 @@ with tab1:
     button_html = """
         <style>
             .custom-button {
-                background-color: #003366;
+                background-color: #003377;
                 color: white;
                 padding: 10px 20px;
                 text-align: center;
