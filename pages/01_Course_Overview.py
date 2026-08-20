@@ -112,16 +112,15 @@ with tab2:
 
     st.divider()
 
-    # --- Evaluation table ---
+    # --- Evaluation table (alternative: keep st.dataframe, separate Link column) ---
     st.markdown("### ✅ Evaluation")
     data = [
-        ["Attendance & class participation", "10%", "Unexcused absence (−1); late check-in (−0.2)"],
-        ["Quizzes", "40%", "[quiz schedule](https://docs.google.com/spreadsheets/d/1PfywzAfzNer4iu1iZBXo54AHb1xYcvKi5dh10qzrzBU/edit?usp=sharing)"],
-        ["Exam", "40%", "Final exam"],
-        ["Assignments", "10%", "Group activities: Exercises (5), Transcription (5)"]
+        ["Attendance & class participation", "10%", "Unexcused absence (−1); late check-in (−0.2)", None],
+        ["Quizzes", "40%", "See quiz schedule", "https://docs.google.com/spreadsheets/d/1PfywzAfzNer4iu1iZBXo54AHb1xYcvKi5dh10qzrzBU/edit?usp=sharing"],
+        ["Exam", "40%", "Final exam", None],
+        ["Assignments", "10%", "Group activities: Exercises (5), Transcription (5)", None],
     ]
-    df = pd.DataFrame(data, columns=["Component", "Percentage", "Notes"])
-
+    df = pd.DataFrame(data, columns=["Component", "Percentage", "Notes", "Link"])
     st.dataframe(
         df,
         use_container_width=True,
@@ -130,6 +129,7 @@ with tab2:
             "Component": st.column_config.Column(width="medium"),
             "Percentage": st.column_config.Column(width=90),
             "Notes": st.column_config.Column(width="large"),
+            "Link": st.column_config.LinkColumn("Link", display_text="Open"),
         },
     )
 
