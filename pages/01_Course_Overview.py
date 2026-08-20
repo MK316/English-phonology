@@ -10,44 +10,39 @@ st.title("📘 Course Overview")
 tab1, tab2, tab3 = st.tabs(["Schedule", "Syllabus", "TBA"])
 
 with tab1:
-    # Start on Thursday, September 3, 2026 (course meets Mondays & Thursdays)
-    start_date = datetime(2026, 9, 3)
+    st.markdown("#### Schedule for Class Activities")
+    st.markdown("""
+    + Grouping (1st week)
+    + Quiz schedule
 
-    # ✅ STEP 1: Fill only the weeks you want — here, Week 3 has data (Sept. 16 & 18)
-    schedule_content = {
-        "2026-09-03": ["Ch. 1", "Syllabus, Course overview", "Grouping", "Reading Chapter 1"],
-        "2026-09-07": ["Ch. 1", "Phonetics review", "Reading", "Summary note-taking"],
-        "2026-09-10": ["Ch. 1", "Sound description", "", "Summary note-taking"],
-        "2026-09-14": ["Ch. 2", "Phonetics & Phonology", "", "Summary note-taking"],
-        "2026-09-17": ["Ch. 3", "English consonants", "", "", ""],
-        "2026-09-21": ["", "", "", ""],
-        "2026-09-24": ["🎈Holiday", "", "", ""],
-        "2026-09-28": ["", "", "", ""],
-        "2026-10-01": ["", "", "", ""],
-        "2026-10-05": ["🎈Alt Holiday", "", "", "🔴 Makeup video "],
-        "2026-10-08": ["", "", "", ""],
-        "2026-10-12": ["", "", "", ""],
-        "2026-10-15": ["", "", "", ""],
-        "2026-10-19": ["", "", "", ""],
-        "2026-10-22": ["", "", "", ""],
-        "2026-10-26": ["", "", "", ""],
-        "2026-10-29": ["", "", "", ""],
-        "2026-11-02": ["", "", "", ""],
-        "2026-11-05": ["", "", "", ""],
-        "2026-11-09": ["", "", "", ""],
-        "2026-11-12": ["", "", "", ""],
-        "2026-11-16": ["", "", "", ""],
-        "2026-11-19": ["", "", "", ""],
-        "2026-11-23": ["", "", "", "🔴 "],
-        "2026-11-26": ["", "", "", ""],
-        "2026-11-30": ["", "", "", ""],
-        "2026-12-03": ["", "", "", ""],
-        "2026-12-07": ["", "", "", ""],
-        "2026-12-10": ["", "", "", ""],
-        "2026-12-14": ["", "", "", ""],
-        "2026-12-17": ["", "", "", "🔴 Final exam"],
-        "2026-12-21": ["", "", "", ""]
-    }
+    """)
+
+    st.markdown("---")
+    # Custom styled HTML button
+    button_html = """
+        <style>
+            .custom-button {
+                background-color: #003366;
+                color: white;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+            }
+            .custom-button:hover {
+                background-color: #002244;
+            }
+        </style>
+        <a href="https://docs.google.com/spreadsheets/d/1PfywzAfzNer4iu1iZBXo54AHb1xYcvKi5dh10qzrzBU/edit?usp=sharing">
+            <button class="custom-button">🎯 Click: Go to Google Sheet</button>
+        </a>
+    """
+    st.markdown(button_html, unsafe_allow_html=True)
+
 
     # ✅ STEP 2: Build the HTML table (Week 1-16, Thursday rows highlighted light blue)
     table_rows_html = ""
