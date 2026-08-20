@@ -93,7 +93,7 @@ with tab2:
     st.audio(audio_bytes, format="audio/mp3", start_time=0)
 
     # --- Textbook & Software ---
-    st.markdown("### 📚 Textbook & Software")
+    st.markdown("### 📚 Textbook & Apps")
     tb, sw = st.columns(2)
     with tb:
         st.markdown(
