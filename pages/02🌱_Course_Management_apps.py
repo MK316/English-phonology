@@ -250,9 +250,6 @@ with tabs[2]:
             )
     else:
         st.error("The file must contain both `Course` and `Name_ori` columns.")
-#--------Tab 3
-
-import streamlit as st
 
 with tabs[3]:
     st.markdown("#### Google Sheet to share for Class Activities")
