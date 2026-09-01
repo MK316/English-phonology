@@ -7,9 +7,10 @@ st.set_page_config(
     layout="wide"
 )
 
-html = Path("ex01_test.html").read_text(
-    encoding="utf-8"
-)
+BASE_DIR = Path(__file__).resolve().parent
+html_path = BASE_DIR / "exercises" / "ex01_test.html"
+
+html = html_path.read_text(encoding="utf-8")
 
 components.html(
     html,
