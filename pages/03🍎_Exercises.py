@@ -4,7 +4,7 @@ from pathlib import Path
 
 # ---------------- Page setup ----------------
 st.set_page_config(
-    page_title="Phonetics Exercises",
+    page_title="AEP Exercises",
     layout="wide"
 )
 
