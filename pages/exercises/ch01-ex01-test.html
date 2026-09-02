@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phonetics Exercises — 연습문제</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root{
+    --paper:#f6f2ea;
+    --ink:#2a2620;
+    --ink-soft:#6b6252;
+    --rule:#d8cfba;
+    --accent:#8a3324;
+    --accent-soft:#efe0d4;
+    --good:#3c6e47;
+    --bad:#a13a2f;
+    --card:#fffdf8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Noto Serif KR",serif;
+    line-height:1.55;
+  }
+  header{
+    padding:28px 24px 18px;
+    border-bottom:1px solid var(--rule);
+    background:linear-gradient(180deg,#faf7f0,var(--paper));
+  }
+  header h1{
+    margin:0 0 4px;
+    font-size:1.5rem;
+    font-weight:600;
+    letter-spacing:0.01em;
+  }
+  header p{
+    margin:0;
+    color:var(--ink-soft);
+    font-size:0.92rem;
+  }
+  .layout{
+    display:flex;
+    max-width:1080px;
+    margin:0 auto;
+    align-items:flex-start;
+  }
+  nav{
+    position:sticky;
+    top:0;
+    width:190px;
+    flex-shrink:0;
+    padding:20px 10px 40px 20px;
+    height:100vh;
+    overflow-y:auto;
+  }
+  nav button{
+    display:block;
+    width:100%;
+    text-align:left;
+    background:none;
+    border:none;
+    border-left:2px solid transparent;
+    padding:6px 10px;
+    margin-bottom:2px;
+    font-family:inherit;
+    font-size:0.86rem;
+    color:var(--ink-soft);
+    cursor:pointer;
+    border-radius:0 4px 4px 0;
+  }
+  nav button:hover{ background:var(--accent-soft); color:var(--ink); }
+  nav button.active{
+    border-left:2px solid var(--accent);
+    color:var(--accent);
+    background:var(--accent-soft);
+    font-weight:600;
+  }
+  main{
+    flex:1;
+    padding:24px 28px 80px;
+    min-width:0;
+  }
+  .section{ display:none; }
+  .section.active{ display:block; animation:fade .25s ease; }
+  @keyframes fade{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;} }
+  .section h2{
+    font-size:1.2rem;
+    margin:0 0 4px;
+    color:var(--accent);
+  }
+  .instructions{
+    color:var(--ink-soft);
+    font-size:0.94rem;
+    margin-bottom:18px;
+    font-style:italic;
+  }
+  .example{
+    background:var(--accent-soft);
+    border-radius:6px;
+    padding:10px 14px;
+    font-size:0.88rem;
+    color:var(--ink-soft);
+    margin-bottom:18px;
+  }
+  .item{
+    background:var(--card);
+    border:1px solid var(--rule);
+    border-radius:8px;
+    padding:12px 16px;
+    margin-bottom:10px;
+  }
+  .item .prompt{
+    font-size:1rem;
+    margin-bottom:8px;
+  }
+  .item input[type=text]{
+    width:100%;
+    max-width:420px;
+    font-family:inherit;
+    font-size:0.98rem;
+    padding:6px 8px;
+    border:1px solid var(--rule);
+    border-radius:5px;
+    background:#fff;
+  }
+  .item select{
+    font-family:inherit;
+    font-size:0.95rem;
+    padding:5px 8px;
+    border:1px solid var(--rule);
+    border-radius:5px;
+    background:#fff;
+    margin-right:8px;
+  }
+  .row-inline{ display:flex; flex-wrap:wrap; gap:10px 24px; align-items:center; }
+  .checkbox-list{ display:flex; flex-wrap:wrap; gap:8px 18px; }
+  .checkbox-list label{ font-size:0.95rem; display:flex; align-items:center; gap:6px; cursor:pointer; }
+  table.grid{
+    border-collapse:collapse;
+    width:100%;
+    background:var(--card);
+    margin-bottom:6px;
+  }
+  table.grid th, table.grid td{
+    border:1px solid var(--rule);
+    padding:6px 8px;
+    text-align:center;
+    font-size:0.85rem;
+  }
+  table.grid th{ background:var(--accent-soft); font-weight:600; }
+  table.grid td input{
+    width:100%;
+    border:none;
+    background:transparent;
+    text-align:center;
+    font-family:inherit;
+    font-size:0.85rem;
+  }
+  table.grid td input:focus{ outline:1px solid var(--accent); border-radius:3px; }
+  .row-label{ text-align:left !important; font-weight:600; white-space:nowrap; background:#faf6ee; }
+  .navfoot{
+    display:flex;
+    justify-content:space-between;
+    margin-top:26px;
+    padding-top:14px;
+    border-top:1px solid var(--rule);
+  }
+  .navfoot button{
+    font-family:inherit;
+    font-size:0.9rem;
+    padding:9px 18px;
+    border-radius:6px;
+    border:1px solid var(--rule);
+    background:#fff;
+    cursor:pointer;
+  }
+  .navfoot button:hover{ background:var(--accent-soft); }
+  .submit-panel{
+    background:var(--card);
+    border:1px solid var(--rule);
+    border-radius:8px;
+    padding:22px;
+  }
+  .submit-panel h2{ color:var(--accent); margin-top:0; }
+  .submit-panel label{ display:block; font-size:0.9rem; margin-bottom:6px; color:var(--ink-soft); }
+  .submit-panel input[type=text]{
+    font-family:inherit;
+    font-size:1rem;
+    padding:8px 10px;
+    border:1px solid var(--rule);
+    border-radius:6px;
+    width:260px;
+    margin-bottom:16px;
+  }
+  .btn-primary{
+    font-family:inherit;
+    font-size:1rem;
+    padding:11px 22px;
+    border-radius:7px;
+    border:none;
+    background:var(--accent);
+    color:#fff;
+    cursor:pointer;
+  }
+  .btn-primary:hover{ background:#71281d; }
+  .btn-primary:disabled{ background:#c9b8ac; cursor:wait; }
+  .score-summary{
+    margin-top:18px;
+    font-size:1.05rem;
+  }
+  .score-summary b{ color:var(--accent); font-size:1.3rem; }
+  .section-controls{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    margin:16px 0 10px;
+    flex-wrap:wrap;
+  }
+  .btn-secondary{
+    font-family:inherit;
+    font-size:0.88rem;
+    padding:8px 14px;
+    border-radius:6px;
+    border:1px solid var(--accent);
+    background:#fff;
+    color:var(--accent);
+    cursor:pointer;
+  }
+  .btn-secondary:hover{ background:var(--accent-soft); }
+  .btn-secondary:disabled{ opacity:0.5; cursor:default; }
+  .section-score-line{ font-size:0.95rem; margin-bottom:8px; }
+  .section-score-line b{ color:var(--accent); }
+  table.result-table{ margin-bottom:4px; }
+  table.result-table th, table.result-table td{ text-align:left; }
+  td.ok-cell{ color:var(--good); font-weight:700; text-align:center !important; }
+  td.no-cell{ color:var(--bad); font-weight:700; text-align:center !important; }
+  @media(max-width:760px){
+    .layout{ flex-direction:column; }
+    nav{ position:static; width:100%; height:auto; display:flex; flex-wrap:wrap; padding:14px; }
+    nav button{ width:auto; border-left:none; border-bottom:2px solid transparent; }
+    nav button.active{ border-left:none; border-bottom:2px solid var(--accent); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Phonetics Exercises</h1>
+  <p>섹션별로 문제를 풀고 각 섹션 하단의 "채점하기"로 바로 정답을 확인하세요. 전체를 다 풀지 않아도 섹션별로 PDF 채점표를 저장할 수 있습니다.</p>
+</header>
+
+<div class="layout">
+  <nav id="nav"></nav>
+  <main id="main">
+    <div id="sections"></div>
+    <div class="navfoot">
+      <button id="prevBtn">← 이전</button>
+      <button id="nextBtn">다음 →</button>
+    </div>
+  </main>
+</div>
+
+<script>
+/* ========================= 데이터 정의 ========================= */
+
+// 유틸: 문자열 정규화 (비교용)
+function norm(s){
+  return (s||"")
+    .toLowerCase()
+    .replace(/[\[\]\/,.;:"'()]/g,"")
+    .replace(/\s+/g,"")
+    .trim();
+}
+// contains 매칭: expected(콤마/슬래시로 구분된 키워드 배열)가 학생답에 모두 포함되는지
+function containsAll(studentRaw, keywords){
+  const s = norm(studentRaw);
+  if(!s) return false;
+  return keywords.every(k => s.includes(norm(k)));
+}
+function exactMatch(studentRaw, accepted){
+  const s = norm(studentRaw);
+  if(!s) return false;
+  const list = Array.isArray(accepted) ? accepted : [accepted];
+  return list.some(a => norm(a)===s);
+}
+
+/* ---- Exercise 1: 전사 교정 ---- */
+const EX1 = [
+ {w:"injured", given:"[ɪnjərd]", correct:true, fix:"ɪndʒərd"},
+ {w:"gelatin", given:"[gɛlətɪn]", correct:true, fix:"dʒɛlətɪn"},
+ {w:"wrote", given:"[wrot]", correct:true, fix:"roʊt"},
+ {w:"measure", given:"[mɛʃuɹ]", correct:true, fix:"mɛʒər"},
+ {w:"inches", given:"[ɪntʃəs]", correct:true, fix:"ɪntʃəz"},
+ {w:"tough", given:"[taf]", correct:false},
+ {w:"caution", given:"[kɔʃən]", correct:false},
+ {w:"topical", given:"[tɑpɪkəl]", correct:true, fix:"tɑpəkəl"},
+ {w:"grain", given:"[gren]", correct:true, fix:"greɪn"},
+ {w:"telephone", given:"[tɛləfon]", correct:true, fix:"tɛləfoʊn"},
+ {w:"syllable", given:"[sələbəl]", correct:true, fix:"sɪləbəl"},
+ {w:"phone", given:"[fon]", correct:true, fix:"foʊn"},
+];
+
+/* ---- Exercise 2: 분절음/음절 수 ---- */
+const EX2 = [
+ ["homophone","7,3"],["equestrian","10,4"],["analysis","8,4"],["thousand","6,2"],
+ ["broach","4,1"],["writer","4,2"],["language","7,2"],["anniversary","9,5"],
+ ["thatched","4,1"],["middle","4,2"],["electron","8,3"],["evaporate","8,4"],
+ ["knack","3,1"],["photographer","9,4"],["ingredient","10,4"],["camouflage","8,3"],
+ ["lesson","4,2"],["imagination","10,5"],["translation","10,3"],["possible","7,3"],
+];
+
+/* ---- Exercise 3: 초성 조음위치 S/D ---- */
+const EX3 = [
+ ["goose – gerrymander","D","velar, palato-alveolar"],
+ ["simple – shackle","D","alveolar, palato-alveolar"],
+ ["curious – cereal","D","velar, alveolar"],
+ ["phonetic – fictional","S","labio-dental"],
+ ["manners – wicker","D","bilabial, labio-velar"],
+ ["normal – location","S","alveolar"],
+ ["wander – yesterday","D","labio-velar, palatal"],
+ ["those – Thursday","S","interdental"],
+ ["scissors – zipper","S","alveolar"],
+ ["temperate – chestnut","D","alveolar, palato-alveolar"],
+ ["chromosome – chief","D","velar, palato-alveolar"],
+ ["baker – delegate","D","bilabial, alveolar"],
+ ["happened – usual","D","glottal, palatal"],
+ ["neuron – market","D","alveolar, bilabial"],
+ ["painting – broccoli","S","bilabial"],
+];
+
+/* ---- Exercise 4: 종성 조음방식 S/D ---- */
+const EX4 = [
+ ["album – broken","S","nasal"],
+ ["ideal – keepsake","D","liquid, stop"],
+ ["prologue – confine","D","stop, nasal"],
+ ["aqueous – sociable","D","fricative, liquid"],
+ ["variable – watch","D","liquid, affricate"],
+ ["waste – adage","D","stop, affricate"],
+ ["barometer – finish","D","approximant, fricative"],
+ ["inch – gauge","S","affricate"],
+ ["fiord – equip","S","stop"],
+ ["barb – relief","D","stop, fricative"],
+ ["alive – fiftieth","S","fricative"],
+ ["laughing – hydraulic","D","nasal, stop"],
+ ["opulence – paramedic","D","fricative, stop"],
+ ["outrage – swivel","D","affricate, liquid"],
+ ["dominion – eminent","D","nasal, stop"],
+];
+
+/* ---- Exercise 5: 밑줄 모음 same/diff + 기술 ---- */
+const EX5 = [
+ ["primary – nutrition","Different","ɛ","mid, front, lax","u","high, back, tense"],
+ ["heal – electricity","Different","i","high, front, tense","ɪ","high, front, lax"],
+ ["beau – aperture","Different","oʊ","mid, back, tense","æ","low, front, lax"],
+ ["anywhere – phantasm","Different","i","high, front, tense","æ","low, front, lax"],
+ ["exposure – coaster","Same","oʊ","mid, back, tense","oʊ","mid, back, tense"],
+ ["explicable – explicate","Same","ɪ","high, front, lax","ɪ","high, front, lax"],
+ ["wave – irrigate","Same","eɪ","mid, front, tense","eɪ","mid, front, tense"],
+ ["measure – finger","Different","ɛ","mid, front, lax","ɪ","high, front, lax"],
+ ["butter – tough","Same","ʌ","mid, back, lax","ʌ","mid, back, lax"],
+ ["cholesterol – bottom","Different","ə","mid, central, lax","ɑ","low, back, tense"],
+ ["nymph – jump","Different","ɪ","high, front, lax","ʌ","mid, back, lax"],
+ ["abate – caught","Different","eɪ","mid, front, tense","ɔ","mid-low, back, tense"],
+];
+
+/* ---- Exercise 6: 단어 고르기 ---- */
+const EX6 = [
+ {crit:"start with a fricative", words:["foreign","theater","tidings","hospital","cassette","shroud"], correct:["foreign","theater","hospital","shroud"]},
+ {crit:"end in a sibilant", words:["wishes","twelfth","clutch","indicates","admonish","furtive"], correct:["wishes","clutch","indicates","admonish"]},
+ {crit:"have an approximant", words:["winter","university","captive","ripe","little","mute"], correct:["winter","university","ripe","little","mute"]},
+ {crit:"contain a back vowel", words:["putter","boost","roast","fraud","matter","hospital"], correct:["putter","boost","roast","fraud","hospital"]},
+ {crit:"start with a voiced obstruent", words:["government","pottery","taxonomy","jury","phonograph","sister"], correct:["government","jury"]},
+ {crit:"contain a lax vowel", words:["auction","redeem","ledger","cram","boat","loom"], correct:["auction","redeem","ledger","cram"]},
+ {crit:"end in an alveolar", words:["went","atom","rigor","column","multiple","garnish"], correct:["went","multiple"]},
+ {crit:"have a velar", words:["page","sang","clean","talc","grow","focus"], correct:["sang","clean","talc","grow","focus"]},
+];
+
+/* ---- Exercise 7: 음절구조 표 ---- */
+const EX7_WORDS = ["lunch","church","stray","those","raise","change","south","prints","blue","plough"];
+const EX7_DATA = {
+ lunch:["lʌntʃ","l","ʌntʃ","ʌ","ntʃ"],
+ church:["tʃɜrtʃ","tʃ","ɜrtʃ","ɜr","tʃ"],
+ stray:["streɪ","str","eɪ","eɪ","-"],
+ those:["ðoʊz","ð","oʊz","oʊ","z"],
+ raise:["reɪz","r","eɪz","eɪ","z"],
+ change:["tʃeɪndʒ","tʃ","eɪndʒ","eɪ","ndʒ"],
+ south:["saʊθ","s","aʊθ","aʊ","θ"],
+ prints:["prɪnts","pr","ɪnts","ɪ","nts"],
+ blue:["blu","bl","u","u","-"],
+ plough:["plaʊ","pl","aʊ","aʊ","-"],
+};
+const EX7_COLS = ["Transcription","Onset","Rhyme","Nucleus","Coda"];
+
+/* ---- Exercise 8: 밑줄 소리 비교 ---- */
+const EX8 = [
+ ["telephone – television","f, v","labio-dental","voiceless, voiced"],
+ ["atop – wiser","t, z","alveolar","voiceless stop, voiced fricative"],
+ ["bitter – easy","ɾ, z","alveolar, voiced","flap vs fricative"],
+ ["mister – enemy","m, n","nasal, voiced","bilabial vs alveolar"],
+ ["shipment – justice","ʃ, dʒ","palato-alveolar","voiceless fricative, voiced affricate"],
+ ["wait – root","w, r","voiced approximant","labio-velar glide vs alveolar liquid"],
+ ["lime – window","l, w","voiced approximant","alveolar lateral vs labio-velar glide"],
+ ["alone – elevate","l, l","alveolar lateral approximant, voiced","same"],
+ ["feather – fought","ɛ, ɔ","vowels","mid front lax vs mid-low back tense"],
+ ["limp – soccer","p, k","voiceless stop","bilabial vs velar"],
+];
+
+/* ---- Exercise 9: 그룹에서 다른 것 찾기 ---- */
+const EX9 = [
+ ["/f, ʃ, tʃ, z, θ, ʒ, ð/","tʃ","affricate, fricative"],
+ ["/t, z, n, m, d, l, s/","m","bilabial, alveolar"],
+ ["/ɪ, ɛ, ʊ, u, æ, ʌ/","u","tense, lax"],
+ ["/n, g, v, s, z, ɹ, m/","s","voiceless, voiced"],
+ ["/m, w, ŋ, p, b/","p","voiceless, voiced"],
+ ["/i, ɪ, æ, ɑ, e, ɛ/","ɑ","back, front"],
+];
+
+/* ---- Exercise 10/11: 조음기관 표 ---- */
+const ART_WORDS = ["sipped","latex","triumph","bridge","rough","fought","dogs","palm"];
+const EX10_DATA = {
+ "Upper articulator":["alveolar ridge","alveolar ridge","upper teeth","alveolar ridge","upper teeth","alveolar ridge","alveolar ridge","upper lip"],
+ "Lower articulator":["tongue tip","tongue tip","lower lip","tongue blade","lower lip","tongue tip","tongue tip","lower lip"],
+ "Voicing":["voiceless","voiceless","voiceless","voiced","voiceless","voiceless","voiced","voiced"],
+ "Manner of articulation":["stop","fricative","fricative","affricate","fricative","stop","fricative","nasal"],
+};
+const EX11_DATA = {
+ "Upper articulator":["alveolar ridge","alveolar ridge","alveolar ridge","upper lip","alveolar ridge","upper teeth","alveolar ridge","upper lip"],
+ "Lower articulator":["tongue tip","tongue tip","tongue tip","lower lip","tongue tip","lower lip","tongue tip","lower lip"],
+ "Voicing":["voiceless","voiced","voiceless","voiced","voiced","voiceless","voiced","voiceless"],
+ "Manner of articulation":["fricative","liquid","stop","stop","liquid","fricative","stop","stop"],
+};
+const ART_ROWS = ["Upper articulator","Lower articulator","Voicing","Manner of articulation"];
+
+/* ---- Exercise 12: 첫 모음 표 ---- */
+const VOWEL_WORDS = ["park","ocean","make","ember","hamper","fought","hypocrite","chew"];
+const EX12_DATA = {
+ "Tongue height":["low","mid","mid","mid","low","mid-low","high","high"],
+ "Frontness/backness":["back","back","front","front","front","back","front","back"],
+ "Lip position":["unrounded","rounded","unrounded","unrounded","unrounded","rounded","unrounded","rounded"],
+ "Tenseness/laxness":["tense","tense","tense","lax","lax","tense","lax","tense"],
+};
+const VOWEL_ROWS = ["Tongue height","Frontness/backness","Lip position","Tenseness/laxness"];
+
+/* ---- Exercise 13: 선택형 ---- */
+const EX13 = [
+ {text:"Tensing the vocal cords makes them vibrate", opts:["faster","slower"], correct:"faster"},
+ {text:"...so that the pitch", opts:["increases","decreases"], correct:"increases"},
+ {text:"In the production of ___, the air is blocked from going out through the nose and the mouth.", opts:["stops","fricatives","glides","affricates"], correct:"stops"},
+ {text:"In the production of ___, the constriction of the vocal tract is such that a noisy airstream is formed.", opts:["stops","liquids","fricatives","nasals"], correct:"fricatives"},
+ {text:"In the production of palato-alveolar sounds, the ___ of the tongue goes to the forward part of the...", opts:["tip","front","blade","back"], correct:"blade"},
+ {text:"...forward part of the ___.", opts:["hard palate","soft palate","uvula"], correct:"hard palate"},
+ {text:"In the production of ___ sounds, the two lips approach one another, and the back of the tongue is raised toward the soft palate.", opts:["labio-dental","bilabial","labio-velar","velar"], correct:"labio-velar"},
+];
+
+/* ========================= 섹션 정의 & 렌더링 ========================= */
+const SECTIONS = [
+ {id:1, title:"1. 전사 교정"},
+ {id:2, title:"2. 분절음·음절 수"},
+ {id:3, title:"3. 초성 조음위치"},
+ {id:4, title:"4. 종성 조음방식"},
+ {id:5, title:"5. 모음 비교"},
+ {id:6, title:"6. 단어 고르기"},
+ {id:7, title:"7. 음절 구조"},
+ {id:8, title:"8. 소리 자질 비교"},
+ {id:9, title:"9. 그룹 판별"},
+ {id:10, title:"10. 종성 조음기관"},
+ {id:11, title:"11. 초성 조음기관"},
+ {id:12, title:"12. 첫 모음 자질"},
+ {id:13, title:"13. 올바른 대안 고르기"},
+ {id:"submit", title:"✓ 제출 및 채점"},
+];
+
+let currentIndex = 0;
+const answers = {}; // id -> value(s)
+
+function el(tag, attrs={}, html=""){
+  const e = document.createElement(tag);
+  Object.entries(attrs).forEach(([k,v])=> e.setAttribute(k,v));
+  e.innerHTML = html;
+  return e;
+}
+
+// 섹션 하단에 "채점하기" / "PDF로 저장" 버튼과 결과 표시 영역을 붙인다.
+function appendGradingControls(sectionEl, title, gradeFn){
+  const controls = el('div',{class:'section-controls'});
+  controls.innerHTML = `
+    <button class="btn-secondary" data-role="check">이 섹션 채점하기</button>
+    <button class="btn-secondary" data-role="pdf" disabled>이 섹션 PDF로 저장</button>
+  `;
+  const resultBox = el('div',{class:'result-box'});
+  sectionEl.appendChild(controls);
+  sectionEl.appendChild(resultBox);
+
+  let lastResults = null;
+
+  controls.querySelector('[data-role="check"]').onclick = ()=>{
+    lastResults = gradeFn();
+    const total = lastResults.length;
+    const correctCount = lastResults.filter(r=>r.ok).length;
+    let html = `<div class="section-score-line">${title}: <b>${correctCount}</b> / ${total} 정답</div>`;
+    html += `<table class="grid result-table"><tr><th style="width:34%">문항</th><th style="width:28%">내 답</th><th style="width:32%">정답</th><th style="width:6%">채점</th></tr>`;
+    lastResults.forEach(r=>{
+      html += `<tr><td>${escapeHtml(r.prompt)}</td><td>${escapeHtml(r.student)}</td><td>${escapeHtml(r.correct)}</td><td class="${r.ok?'ok-cell':'no-cell'}">${r.ok?'O':'X'}</td></tr>`;
+    });
+    html += `</table>`;
+    resultBox.innerHTML = html;
+    controls.querySelector('[data-role="pdf"]').disabled = false;
+  };
+
+  controls.querySelector('[data-role="pdf"]').onclick = async (e)=>{
+    if(!lastResults) return;
+    const btn = e.currentTarget;
+    const original = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = "PDF 생성 중...";
+    try{
+      await exportPdf(lastResults, title);
+    } catch(err){
+      console.error(err);
+      alert("PDF 생성 중 문제가 발생했습니다: " + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = original;
+    }
+  };
+}
+
+
+function buildNav(){
+  const nav = document.getElementById('nav');
+  SECTIONS.forEach((s,i)=>{
+    const b = document.createElement('button');
+    b.textContent = s.title;
+    b.dataset.index = i;
+    b.onclick = ()=> showSection(i);
+    nav.appendChild(b);
+  });
+}
+
+function showSection(i){
+  currentIndex = i;
+  document.querySelectorAll('#sections .section').forEach((s,idx)=>{
+    s.classList.toggle('active', idx===i);
+  });
+  document.querySelectorAll('nav button').forEach((b,idx)=>{
+    b.classList.toggle('active', idx===i);
+  });
+  document.getElementById('prevBtn').style.visibility = i===0 ? 'hidden':'visible';
+  document.getElementById('nextBtn').style.visibility = i===SECTIONS.length-1 ? 'hidden':'visible';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function buildSections(){
+  const root = document.getElementById('sections');
+
+  // --- Section 1 ---
+  const s1 = el('div',{class:'section', 'data-key':'1'});
+  s1.appendChild(el('h2',{},'1. 전사 교정'));
+  s1.appendChild(el('p',{class:'instructions'},'Examine the following transcriptions. If you agree, do nothing (정확함 선택); if erroneous, 오류 선택 후 올바른 전사를 입력하세요.'));
+  EX1.forEach((it,idx)=>{
+    const box = el('div',{class:'item'});
+    box.appendChild(el('div',{class:'prompt'},`<b>${it.w}</b> ${it.given}`));
+    const row = el('div',{class:'row-inline'});
+    row.innerHTML = `
+      <label><input type="radio" name="e1_${idx}_status" value="correct"> 정확함</label>
+      <label><input type="radio" name="e1_${idx}_status" value="wrong"> 오류 있음 →</label>
+      <input type="text" id="e1_${idx}_fix" placeholder="올바른 전사 (예: ɪndʒərd)" style="max-width:220px;">
+    `;
+    box.appendChild(row);
+    s1.appendChild(box);
+  });
+  appendGradingControls(s1, "1. 전사 교정", gradeEx1);
+  root.appendChild(s1);
+
+  // --- Section 2 ---
+  const s2 = el('div',{class:'section','data-key':'2'});
+  s2.appendChild(el('h2',{},'2. 분절음·음절 수'));
+  s2.appendChild(el('p',{class:'instructions'},'How many sound segments and syllables are there in each word? (예: 7,3)'));
+  s2.appendChild(el('div',{class:'example'},'Example: revolution [rɛvəluʃən] → 9 segments, 4 syllables'));
+  const grid2 = el('div',{style:'display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;'});
+  EX2.forEach(([w],idx)=>{
+    const box = el('div',{class:'item'});
+    box.appendChild(el('div',{class:'prompt'},`<b>${w}</b>`));
+    box.innerHTML += `<input type="text" id="e2_${idx}" placeholder="segments,syllables">`;
+    grid2.appendChild(box);
+  });
+  s2.appendChild(grid2);
+  appendGradingControls(s2, "2. 분절음·음절 수", gradeEx2);
+  root.appendChild(s2);
+
+  // --- Section 3 ---
+  const s3 = el('div',{class:'section','data-key':'3'});
+  s3.appendChild(el('h2',{},'3. 초성 조음위치 (Place of Articulation)'));
+  s3.appendChild(el('p',{class:'instructions'},'State whether the place of articulation is the same (S) or different (D) in the initial consonants, and state the place(s).'));
+  s3.appendChild(el('div',{class:'example'},'Example: now – pneumonia → Same; alveolar &nbsp;|&nbsp; sun – sugar → Different; alveolar vs. palato-alveolar'));
+  EX3.forEach((it,idx)=>{
+    const box = el('div',{class:'item'});
+    box.appendChild(el('div',{class:'prompt'},`(${String.fromCharCode(97+idx)}) <b>${it[0]}</b>`));
+    box.innerHTML += `<input type="text" id="e3_${idx}" placeholder="예: D: velar/palato-alveolar">`;
+    s3.appendChild(box);
+  });
+  appendGradingControls(s3, "3. 초성 조음위치", gradeEx3);
+  root.appendChild(s3);
+
+  // --- Section 4 ---
+  const s4 = el('div',{class:'section','data-key':'4'});
+  s4.appendChild(el('h2',{},'4. 종성 조음방식 (Manner of Articulation)'));
+  s4.appendChild(el('p',{class:'instructions'},'State whether the manner of articulation is the same (S) or different (D) in the final consonants, and state the manner(s).'));
+  s4.appendChild(el('div',{class:'example'},'Example: bomb – ten → Same; nasal &nbsp;|&nbsp; rough – zip → Different; fricative vs. stop'));
+  EX4.forEach((it,idx)=>{
+    const box = el('div',{class:'item'});
+    box.appendChild(el('div',{class:'prompt'},`(${String.fromCharCode(97+idx)}) <b>${it[0]}</b>`));
+    box.innerHTML += `<input type="text" id="e4_${idx}" placeholder="예: D: liquid/stop">`;
+    s4.appendChild(box);
+  });
+  appendGradingControls(s4, "4. 종성 조음방식", gradeEx4);
+  root.appendChild(s4);
+
+  // --- Section 5 ---
+  const s5 = el('div',{class:'section','data-key':'5'});
+  s5.appendChild(el('h2',{},'5. 밑줄 모음 비교'));
+  s5.appendChild(el('p',{class:'instructions'},'State whether the vowels in the underlined portions are the same or different, and give phonetic description + symbols.'));
+  s5.appendChild(el('div',{class:'example'},'Example: keel–city → Same: /i/ high, front, tense &nbsp;|&nbsp; mess–mass → Different: /ɛ/ mid,front – /æ/ low,front'));
+  EX5.forEach((it,idx)=>{
+    const box = el('div',{class:'item'});
+    box.appendChild(el('div',{class:'prompt'},`(${String.fromCharCode(97+idx)}) <b>${it[0]}</b>`));
+    box.innerHTML += `<input type="text" id="e5_${idx}" placeholder="예: Different: /ɛ/ mid,front,lax – /u/ high,back,tense">`;
+    s5.appendChild(box);
+  });
+  appendGradingControls(s5, "5. 모음 비교", gradeEx5);
+  root.appendChild(s5);
+
+  // --- Section 6 ---
+  const s6 = el('div',{class:'section','data-key':'6'});
+  s6.appendChild(el('h2',{},'6. 조건에 맞는 단어 고르기'));
+  s6.appendChild(el('p',{class:'instructions'},'Circle (check) the words that satisfy each condition.'));
+  EX6.forEach((it,idx)=>{
+    const box = el('div',{class:'item'});
+    box.appendChild(el('div',{class:'prompt'},`(${String.fromCharCode(97+idx)}) ${it.crit}`));
+    const list = el('div',{class:'checkbox-list'});
+    it.words.forEach((w,wi)=>{
+      list.innerHTML += `<label><input type="checkbox" id="e6_${idx}_${wi}" value="${w}"> ${w}</label>`;
+    });
+    box.appendChild(list);
+    s6.appendChild(box);
+  });
+  appendGradingControls(s6, "6. 단어 고르기", gradeEx6);
+  root.appendChild(s6);
+
+  // --- Section 7 ---
+  const s7 = el('div',{class:'section','data-key':'7'});
+  s7.appendChild(el('h2',{},'7. 음절 구조 (Onset / Rhyme / Nucleus / Coda)'));
+  s7.appendChild(el('p',{class:'instructions'},'Fill in the transcription and syllable structure for each word.'));
+  let t7 = '<table class="grid"><tr><th>Word</th><th>Transcription</th>'+EX7_COLS.slice(1).map(c=>`<th>${c}</th>`).join('')+'</tr>';
+  EX7_WORDS.forEach((w,ri)=>{
+    t7 += `<tr><td class="row-label">${w}</td>`;
+    for(let ci=0; ci<5; ci++){
+      t7 += `<td><input type="text" id="e7_${ri}_${ci}"></td>`;
+    }
+    t7 += '</tr>';
+  });
+  t7 += '</table>';
+  s7.innerHTML += t7;
+  appendGradingControls(s7, "7. 음절 구조", gradeEx7);
+  root.appendChild(s7);
+
+  // --- Section 8 ---
+  const s8 = el('div',{class:'section','data-key':'8'});
+  s8.appendChild(el('h2',{},'8. 밑줄 소리의 공통점·차이점'));
+  s8.appendChild(el('p',{class:'instructions'},'Give the phonetic symbols and state shared feature(s) and difference(s).'));
+  s8.appendChild(el('div',{class:'example'},'Example: [p] "park" – "phone" [f] → Shared: voiceless, obstruent / Diff: [p] bilabial stop, [f] labio-dental fricative'));
+  EX8.forEach((it,idx)=>{
+    const box = el('div',{class:'item'});
+    box.appendChild(el('div',{class:'prompt'},`(${String.fromCharCode(97+idx)}) <b>${it[0]}</b>`));
+    box.innerHTML += `<input type="text" id="e8_${idx}" placeholder="공유 자질 / 차이점을 입력하세요">`;
+    s8.appendChild(box);
+  });
+  appendGradingControls(s8, "8. 소리 자질 비교", gradeEx8);
+  root.appendChild(s8);
+
+  // --- Section 9 ---
+  const s9 = el('div',{class:'section','data-key':'9'});
+  s9.appendChild(el('h2',{},'9. 그룹에서 다른 소리 찾기'));
+  s9.appendChild(el('p',{class:'instructions'},'Circle the sound that does not belong, and identify the shared feature of the rest.'));
+  s9.appendChild(el('div',{class:'example'},'Example: /l,d,s,t,k,z/ → /k/ is velar, the rest are alveolars'));
+  EX9.forEach((it,idx)=>{
+    const box = el('div',{class:'item'});
+    box.appendChild(el('div',{class:'prompt'},`(${String.fromCharCode(97+idx)}) ${it[0]}`));
+    box.innerHTML += `<input type="text" id="e9_${idx}" placeholder="예: /tʃ/ is an affricate, the rest are fricatives">`;
+    s9.appendChild(box);
+  });
+  appendGradingControls(s9, "9. 그룹 판별", gradeEx9);
+  root.appendChild(s9);
+
+  // --- Section 10 & 11 (shared builder) ---
+  function buildArtTable(sectionEl, prefix, rows, cols){
+    let t = '<table class="grid"><tr><th></th>'+cols.map(c=>`<th>${c}</th>`).join('')+'</tr>';
+    rows.forEach((rowName,ri)=>{
+      t += `<tr><td class="row-label">${rowName}</td>`;
+      cols.forEach((c,ci)=>{
+        t += `<td><input type="text" id="${prefix}_${ri}_${ci}"></td>`;
+      });
+      t += '</tr>';
+    });
+    t += '</table>';
+    sectionEl.innerHTML += t;
+  }
+  const s10 = el('div',{class:'section','data-key':'10'});
+  s10.appendChild(el('h2',{},'10. 종성(final sounds) 조음기관'));
+  s10.appendChild(el('p',{class:'instructions'},'Fill in the boxes with the appropriate label for the final sounds of each word.'));
+  buildArtTable(s10,'e10',ART_ROWS,ART_WORDS);
+  appendGradingControls(s10, "10. 종성 조음기관", gradeEx10);
+  root.appendChild(s10);
+
+  const s11 = el('div',{class:'section','data-key':'11'});
+  s11.appendChild(el('h2',{},'11. 초성(initial sounds) 조음기관'));
+  s11.appendChild(el('p',{class:'instructions'},'Do the same for the initial sounds of the same words.'));
+  buildArtTable(s11,'e11',ART_ROWS,ART_WORDS);
+  appendGradingControls(s11, "11. 초성 조음기관", gradeEx11);
+  root.appendChild(s11);
+
+  // --- Section 12 ---
+  const s12 = el('div',{class:'section','data-key':'12'});
+  s12.appendChild(el('h2',{},'12. 첫 모음 자질'));
+  s12.appendChild(el('p',{class:'instructions'},'Fill in the boxes for the first vowels of the following words.'));
+  buildArtTable(s12,'e12',VOWEL_ROWS,VOWEL_WORDS);
+  appendGradingControls(s12, "12. 첫 모음 자질", gradeEx12);
+  root.appendChild(s12);
+
+  // --- Section 13 ---
+  const s13 = el('div',{class:'section','data-key':'13'});
+  s13.appendChild(el('h2',{},'13. 올바른 대안 고르기'));
+  s13.appendChild(el('p',{class:'instructions'},'Circle (select) the correct alternative(s).'));
+  const groupLabels = [
+   "(a) Tensing the vocal cords makes them vibrate ___",
+   "&nbsp;&nbsp;&nbsp;&nbsp;...so that the pitch ___.",
+   "(b) In the production of ___, the air is blocked from going out through the nose and the mouth.",
+   "(c) In the production of ___, the constriction of the vocal tract is such that a noisy airstream is formed.",
+   "(d) In the production of palato-alveolar sounds, the ___ of the tongue goes to the forward part of the...",
+   "&nbsp;&nbsp;&nbsp;&nbsp;...forward part of the ___.",
+   "(e) In the production of ___ sounds, the two lips approach one another, and the back of the tongue is raised toward the soft palate.",
+  ];
+  EX13.forEach((it,idx)=>{
+    const box = el('div',{class:'item'});
+    box.appendChild(el('div',{class:'prompt'}, groupLabels[idx]));
+    let sel = `<select id="e13_${idx}"><option value="">-- 선택 --</option>`;
+    it.opts.forEach(o=> sel += `<option value="${o}">${o}</option>`);
+    sel += '</select>';
+    box.innerHTML += sel;
+    s13.appendChild(box);
+  });
+  appendGradingControls(s13, "13. 올바른 대안", gradeEx13);
+  root.appendChild(s13);
+
+  // --- Submit Section ---
+  const sSub = el('div',{class:'section','data-key':'submit'});
+  sSub.innerHTML = `
+    <div class="submit-panel">
+      <h2>전체 제출 및 채점</h2>
+      <p class="instructions" style="margin-bottom:16px;">각 섹션 하단에서 "이 섹션 채점하기"로 바로바로 확인할 수도 있고, 여기서 전체 문항을 한 번에 채점해 PDF로 받을 수도 있습니다.</p>
+      <label>이름</label>
+      <input type="text" id="studentName" placeholder="이름을 입력하세요">
+      <br>
+      <button class="btn-primary" id="gradeBtn">전체 채점하고 PDF 다운로드</button>
+      <div class="score-summary" id="scoreSummary"></div>
+    </div>
+  `;
+  root.appendChild(sSub);
+}
+
+/* ========================= 채점 로직 (섹션별 함수) ========================= */
+function gradeEx1(){
+  const results = [];
+  EX1.forEach((it,idx)=>{
+    const statusEl = document.querySelector(`input[name="e1_${idx}_status"]:checked`);
+    const status = statusEl ? statusEl.value : "";
+    const fix = document.getElementById(`e1_${idx}_fix`).value;
+    let studentDisplay = status==="correct" ? "정확함" : (status==="wrong" ? `오류 → ${fix||"(미입력)"}` : "(미응답)");
+    let ok=false, correctDisplay;
+    if(it.correct){
+      correctDisplay = `오류 → [${it.fix}]`;
+      ok = status==="wrong" && containsAll(fix, [it.fix]);
+    } else {
+      correctDisplay = "정확함 (수정 불필요)";
+      ok = status==="correct";
+    }
+    results.push({section:"1. 전사 교정", prompt:`${it.w} ${it.given}`, student:studentDisplay, correct:correctDisplay, ok});
+  });
+  return results;
+}
+
+function gradeEx2(){
+  const results = [];
+  EX2.forEach(([w,ans],idx)=>{
+    const v = document.getElementById(`e2_${idx}`).value;
+    const ok = norm(v).replace(/[^\d,]/g,"") === norm(ans).replace(/[^\d,]/g,"");
+    results.push({section:"2. 분절음·음절 수", prompt:w, student:v||"(미응답)", correct:ans, ok});
+  });
+  return results;
+}
+
+function gradeEx3(){
+  const results = [];
+  EX3.forEach((it,idx)=>{
+    const v = document.getElementById(`e3_${idx}`).value;
+    const kws = [it[1], ...it[2].split(",").map(x=>x.trim())];
+    const ok = containsAll(v, kws);
+    results.push({section:"3. 초성 조음위치", prompt:it[0], student:v||"(미응답)", correct:`${it[1]}; ${it[2]}`, ok});
+  });
+  return results;
+}
+
+function gradeEx4(){
+  const results = [];
+  EX4.forEach((it,idx)=>{
+    const v = document.getElementById(`e4_${idx}`).value;
+    const kws = [it[1], ...it[2].split(",").map(x=>x.trim())];
+    const ok = containsAll(v, kws);
+    results.push({section:"4. 종성 조음방식", prompt:it[0], student:v||"(미응답)", correct:`${it[1]}; ${it[2]}`, ok});
+  });
+  return results;
+}
+
+function gradeEx5(){
+  const results = [];
+  EX5.forEach((it,idx)=>{
+    const v = document.getElementById(`e5_${idx}`).value;
+    const [word, sd, sym1, desc1, sym2, desc2] = it;
+    const kws = sd==="Same" ? [sd, sym1] : [sd, sym1, sym2];
+    const ok = containsAll(v, kws);
+    const correctText = sd==="Same" ? `Same: /${sym1}/ ${desc1}` : `Different: /${sym1}/ ${desc1} – /${sym2}/ ${desc2}`;
+    results.push({section:"5. 모음 비교", prompt:word, student:v||"(미응답)", correct:correctText, ok});
+  });
+  return results;
+}
+
+function gradeEx6(){
+  const results = [];
+  EX6.forEach((it,idx)=>{
+    const selected = it.words.filter((w,wi)=> document.getElementById(`e6_${idx}_${wi}`).checked);
+    const selSet = selected.slice().sort().join(",");
+    const corSet = it.correct.slice().sort().join(",");
+    const ok = selSet === corSet;
+    results.push({section:"6. 단어 고르기", prompt:it.crit, student: selected.join(", ")||"(선택 없음)", correct: it.correct.join(", "), ok});
+  });
+  return results;
+}
+
+function gradeEx7(){
+  const results = [];
+  EX7_WORDS.forEach((w,ri)=>{
+    const expected = EX7_DATA[w];
+    for(let ci=0; ci<5; ci++){
+      const v = document.getElementById(`e7_${ri}_${ci}`).value;
+      const ok = exactMatch(v, expected[ci]) || (expected[ci]==="-" && norm(v)==="");
+      results.push({section:"7. 음절 구조", prompt:`${w} — ${EX7_COLS[ci]}`, student:v||"(미응답)", correct:expected[ci], ok});
+    }
+  });
+  return results;
+}
+
+function gradeEx8(){
+  const results = [];
+  EX8.forEach((it,idx)=>{
+    const v = document.getElementById(`e8_${idx}`).value;
+    const symKw = it[1].split(",").map(x=>x.trim());
+    const ok = containsAll(v, symKw);
+    results.push({section:"8. 소리 자질 비교", prompt:it[0], student:v||"(미응답)", correct:`[${it[1]}] — 공유: ${it[2]}; 차이: ${it[3]}`, ok});
+  });
+  return results;
+}
+
+function gradeEx9(){
+  const results = [];
+  EX9.forEach((it,idx)=>{
+    const v = document.getElementById(`e9_${idx}`).value;
+    const ok = containsAll(v, [it[1]]);
+    results.push({section:"9. 그룹 판별", prompt:it[0], student:v||"(미응답)", correct:`/${it[1]}/ — ${it[2]}`, ok});
+  });
+  return results;
+}
+
+function gradeArtTable(prefix, dataObj, rows, cols, sectionLabel){
+  const results = [];
+  rows.forEach((rowName,ri)=>{
+    cols.forEach((colName,ci)=>{
+      const v = document.getElementById(`${prefix}_${ri}_${ci}`).value;
+      const expected = dataObj[rowName][ci];
+      const ok = containsAll(v, [expected]);
+      results.push({section:sectionLabel, prompt:`${colName} — ${rowName}`, student:v||"(미응답)", correct:expected, ok});
+    });
+  });
+  return results;
+}
+function gradeEx10(){ return gradeArtTable('e10', EX10_DATA, ART_ROWS, ART_WORDS, "10. 종성 조음기관"); }
+function gradeEx11(){ return gradeArtTable('e11', EX11_DATA, ART_ROWS, ART_WORDS, "11. 초성 조음기관"); }
+function gradeEx12(){ return gradeArtTable('e12', EX12_DATA, VOWEL_ROWS, VOWEL_WORDS, "12. 첫 모음 자질"); }
+
+function gradeEx13(){
+  const results = [];
+  EX13.forEach((it,idx)=>{
+    const v = document.getElementById(`e13_${idx}`).value;
+    const ok = v === it.correct;
+    results.push({section:"13. 올바른 대안", prompt:it.text, student:v||"(미응답)", correct:it.correct, ok});
+  });
+  return results;
+}
+
+function gradeAll(){
+  return [].concat(
+    gradeEx1(), gradeEx2(), gradeEx3(), gradeEx4(), gradeEx5(),
+    gradeEx6(), gradeEx7(), gradeEx8(), gradeEx9(),
+    gradeEx10(), gradeEx11(), gradeEx12(), gradeEx13()
+  );
+}
+
+/* ========================= PDF 생성 ========================= */
+// 섹션(테이블) 하나를 오프스크린에 그려서 캔버스로 캡처한 뒤 즉시 정리
+async function captureBlock(innerHtml, widthPx){
+  const wrap = document.createElement('div');
+  wrap.style.position = 'fixed';
+  wrap.style.left = '-99999px';
+  wrap.style.top = '0';
+  wrap.style.width = widthPx + 'px';
+  wrap.style.background = '#ffffff';
+  wrap.style.color = '#1b1b1b';
+  wrap.style.fontFamily = '"Noto Serif KR",Georgia,serif';
+  wrap.style.padding = '18px 22px';
+  wrap.innerHTML = `<style>
+    table{width:100%;border-collapse:collapse;margin-bottom:4px;}
+    th,td{border:1px solid #ccc;padding:5px 7px;font-size:12px;text-align:left;vertical-align:top;}
+    th{background:#f1e6da;}
+    td.ok{color:#2f6b3a;font-weight:bold;text-align:center;}
+    td.no{color:#a13a2f;font-weight:bold;text-align:center;}
+    h1{font-size:19px;margin:0 0 4px;}
+    h3{font-size:14px;margin:0 0 8px;padding-bottom:4px;border-bottom:1.5px solid #8a3324;color:#8a3324;}
+    .meta{font-size:12px;color:#555;margin-bottom:4px;}
+    .totalbox{padding:12px 16px;border:1.5px solid #8a3324;border-radius:6px;font-size:14px;}
+  </style>` + innerHtml;
+  document.body.appendChild(wrap);
+  await new Promise(r=>setTimeout(r,30));
+  let canvas;
+  try{
+    canvas = await html2canvas(wrap, {scale:1.5, backgroundColor:"#ffffff", useCORS:true});
+  } finally {
+    wrap.remove();
+  }
+  return canvas;
+}
+
+// results: 채점 결과 배열, labelForTitle: PDF 제목/파일명에 쓸 라벨 (예: "1. 전사 교정" 또는 "전체")
+async function exportPdf(results, labelForTitle){
+  if(!window.jspdf || !window.html2canvas){
+    throw new Error("PDF 라이브러리를 불러오지 못했습니다. 인터넷 연결을 확인한 뒤 새로고침해서 다시 시도해주세요.");
+  }
+
+  const total = results.length;
+  const correctCount = results.filter(r=>r.ok).length;
+  const pct = total ? Math.round((correctCount/total)*1000)/10 : 0;
+
+  const name = document.getElementById('studentName') ? (document.getElementById('studentName').value || "이름 미입력") : "이름 미입력";
+  const today = new Date().toLocaleDateString('ko-KR');
+
+  // 섹션별로 그룹화 (단일 섹션 채점이면 그룹이 하나뿐)
+  const bySection = {};
+  results.forEach(r=>{
+    if(!bySection[r.section]) bySection[r.section]=[];
+    bySection[r.section].push(r);
+  });
+
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF('p','mm','a4');
+  const pageW = 210, pageH = 297;
+  const widthPx = 720;
+  let yCursor = 0;
+  let firstImage = true;
+
+  function placeCanvas(canvas){
+    const imgW = pageW;
+    const imgH = canvas.height * imgW / canvas.width;
+    const imgData = canvas.toDataURL('image/jpeg', 0.92);
+
+    if(imgH > pageH){
+      // 한 블록이 한 페이지보다 길면 슬라이스해서 여러 페이지에 나눠 붙임
+      let heightLeft = imgH;
+      let position = 0;
+      if(!firstImage) pdf.addPage();
+      pdf.addImage(imgData, 'JPEG', 0, position, imgW, imgH);
+      heightLeft -= pageH;
+      while(heightLeft > 0){
+        position = heightLeft - imgH;
+        pdf.addPage();
+        pdf.addImage(imgData, 'JPEG', 0, position, imgW, imgH);
+        heightLeft -= pageH;
+      }
+      yCursor = 0;
+      firstImage = false;
+      return;
+    }
+
+    if(firstImage){
+      yCursor = 0;
+      firstImage = false;
+    } else if(yCursor + imgH > pageH){
+      pdf.addPage();
+      yCursor = 0;
+    }
+    pdf.addImage(imgData, 'JPEG', 0, yCursor, imgW, imgH);
+    yCursor += imgH;
+  }
+
+  // 헤더 블록
+  const headerHtml = `<h1>Phonetics Exercises — ${escapeHtml(labelForTitle)} 채점표</h1><div class="meta">이름: ${escapeHtml(name)} &nbsp;|&nbsp; 채점일: ${today}</div>`;
+  const headerCanvas = await captureBlock(headerHtml, widthPx);
+  placeCanvas(headerCanvas);
+
+  // 섹션별 블록
+  for(const [sec, items] of Object.entries(bySection)){
+    let rows = `<h3>${escapeHtml(sec)}</h3><table><tr><th style="width:28%">문항</th><th style="width:28%">학생 답</th><th style="width:32%">정답</th><th style="width:6%">채점</th></tr>`;
+    items.forEach(it=>{
+      rows += `<tr><td>${escapeHtml(it.prompt)}</td><td>${escapeHtml(it.student)}</td><td>${escapeHtml(it.correct)}</td><td class="${it.ok?'ok':'no'}">${it.ok?'O':'X'}</td></tr>`;
+    });
+    rows += `</table>`;
+    const canvas = await captureBlock(rows, widthPx);
+    placeCanvas(canvas);
+  }
+
+  // 총점 블록
+  const totalHtml = `<div class="totalbox">총 ${total}문항 중 <b>${correctCount}</b>문항 정답 — 점수: <b>${pct}%</b></div>`;
+  const totalCanvas = await captureBlock(totalHtml, widthPx);
+  placeCanvas(totalCanvas);
+
+  const safeLabel = labelForTitle.replace(/[\\/:*?"<>|]/g,"").replace(/\s+/g,"_");
+  pdf.save(`Phonetics_${safeLabel}_채점표_${name}.pdf`);
+
+  return {total, correctCount, pct};
+}
+
+async function generateFullReport(){
+  const btn = document.getElementById('gradeBtn');
+  const summaryEl = document.getElementById('scoreSummary');
+  btn.disabled = true;
+  btn.textContent = "채점 중...";
+  summaryEl.textContent = "";
+
+  try{
+    const results = gradeAll();
+    const {total, correctCount, pct} = await exportPdf(results, "전체");
+    summaryEl.innerHTML = `총 ${total}문항 중 <b>${correctCount}</b>문항 정답 (${pct}%)`;
+  } catch(err){
+    console.error(err);
+    alert("PDF 생성 중 문제가 발생했습니다: " + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "전체 채점하고 PDF 다운로드";
+  }
+}
+
+function escapeHtml(s){
+  return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+/* ========================= 초기화 ========================= */
+buildNav();
+buildSections();
+showSection(0);
+document.getElementById('prevBtn').onclick = ()=> showSection(Math.max(0,currentIndex-1));
+document.getElementById('nextBtn').onclick = ()=> showSection(Math.min(SECTIONS.length-1,currentIndex+1));
+document.getElementById('gradeBtn').onclick = generateFullReport;
+</script>
+</body>
+</html>
