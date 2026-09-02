@@ -13,7 +13,7 @@ BASE_DIR = Path(__file__).parent
 # value: 이 파일(pages) 기준 상대 경로
 # ============================================================
 APPS = {
-    "Chapter 1 - 어휘 크로스워드": "crossword/crossword.html",
+    "Chapter 1 - 어휘 크로스워드": "crossword/crossword-ch1-part1.html",
     # "Chapter 2 - 어휘 크로스워드": "crossword/ch02_crossword.html",
     # "Chapter 1 - 빈칸 채우기 퀴즈": "quiz/index.html",
 }
