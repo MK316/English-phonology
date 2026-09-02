@@ -16,7 +16,9 @@ EXERCISE_DIR = BASE_DIR / "readings"
 
 # ---------------- Chapter menu ----------------
 chapters = {
-    "Chapter 1": "reading_cloze01.html",
+    "Chapter 1A": "reading_cloze01.html",
+    "Chapter 1B": "reading_cloze01.html",
+    "Chapter 1C": "reading_cloze01.html",
     "Chapter 2": "ex02_test.html",
     "Chapter 3": "ex03_test.html",
     "Chapter 4": "ex04_test.html",
