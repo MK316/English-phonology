@@ -116,8 +116,8 @@ with tab2:
     st.markdown("### ✅ Evaluation")
     data = [
         ["Attendance & class participation", "10%", "Unexcused absence (−1); late check-in (−0.2)", None],
-        ["Quizzes", "40%", "See quiz schedule", "https://docs.google.com/spreadsheets/d/1PfywzAfzNer4iu1iZBXo54AHb1xYcvKi5dh10qzrzBU/edit?usp=sharing"],
-        ["Exam", "40%", "Final exam", None],
+        ["Quizzes", "30%", "See quiz schedule", "https://docs.google.com/spreadsheets/d/1PfywzAfzNer4iu1iZBXo54AHb1xYcvKi5dh10qzrzBU/edit?usp=sharing"],
+        ["Exam", "50%", "Written exam", None],
         ["Assignments", "10%", "Group activities: Exercises (5), Transcription (5)", None],
     ]
     df = pd.DataFrame(data, columns=["Component", "Percentage", "Notes", "Link"])
