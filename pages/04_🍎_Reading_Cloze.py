@@ -8,7 +8,7 @@ st.set_page_config(
     layout="wide"
 )
 
-st.markdown("### Chapters")
+st.markdown("### 📚 Reading Chapters & Review with Cloze Questions")
 
 # ---------------- File path ----------------
 BASE_DIR = Path(__file__).resolve().parent
