@@ -1,7 +1,9 @@
 import base64
+import json
 from pathlib import Path
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 st.set_page_config(page_title="학습 앱 모음", layout="wide")
 
@@ -30,23 +32,37 @@ if not html_path.exists():
 
 html_content = html_path.read_text(encoding="utf-8")
 b64 = base64.b64encode(html_content.encode("utf-8")).decode("utf-8")
-data_uri = f"data:text/html;base64,{b64}"
+label_js = json.dumps(selected_name)
 
-st.markdown(
-    f'''
-    <a href="{data_uri}" target="_blank" rel="noopener noreferrer"
-       style="
-         display:inline-block;
-         padding:14px 26px;
-         background:#1B3A63;
-         color:#fff;
-         font-weight:600;
-         text-decoration:none;
-         border-radius:6px;
-         font-family:sans-serif;
-       ">
-       🚀 &quot;{selected_name}&quot; 새 창에서 열기
-    </a>
-    ''',
-    unsafe_allow_html=True,
+components.html(
+    f"""
+    <button id="open-app-btn" style="
+        display:inline-block;
+        padding:14px 26px;
+        background:#1B3A63;
+        color:#fff;
+        font-weight:600;
+        border:none;
+        border-radius:6px;
+        font-family:sans-serif;
+        font-size:15px;
+        cursor:pointer;
+    ">🚀 {selected_name} 새 창에서 열기</button>
+
+    <script>
+    document.getElementById('open-app-btn').addEventListener('click', function() {{
+        const b64 = "{b64}";
+        const byteChars = atob(b64);
+        const byteNumbers = new Array(byteChars.length);
+        for (let i = 0; i < byteChars.length; i++) {{
+            byteNumbers[i] = byteChars.charCodeAt(i);
+        }}
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], {{ type: 'text/html;charset=utf-8' }});
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+    }});
+    </script>
+    """,
+    height=70,
 )
