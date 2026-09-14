@@ -21,25 +21,28 @@ st.markdown(
 )
 
 # ---------------- 슬라이드 폴더 위치 자동 감지 ----------------
-# 폴더명이 "lectureslide" 또는 "lectureslides"로 섞여 있어도 알아서 찾도록 처리
-_CANDIDATE_FOLDER_NAMES = ["lectureslide", "lectureslides"]
-BASE_DIR = None
-for _name in _CANDIDATE_FOLDER_NAMES:
-    _candidate = Path(__file__).parent / _name
-    if _candidate.exists():
-        BASE_DIR = _candidate
-        break
-if BASE_DIR is None:
-    # 아무 폴더도 없으면 기본값으로 단수형 사용 (에러 메시지에서 실제 경로를 보여줌)
-    BASE_DIR = Path(__file__).parent / _CANDIDATE_FOLDER_NAMES[0]
+# 챕터별로 상위 폴더명이 "lectureslide" / "lectureslides"로 섞여 있어도
+# 각 챕터 폴더가 실제로 들어있는 쪽을 챕터마다 찾아서 사용하도록 처리
+_CANDIDATE_PARENT_NAMES = ["lectureslides", "lectureslide"]
+_CANDIDATE_PARENT_DIRS = [Path(__file__).parent / name for name in _CANDIDATE_PARENT_NAMES]
 
 CHAPTERS = [f"Ch{str(i).zfill(2)}" for i in range(1, 8)]  # Ch01 ~ Ch07
 IMAGE_EXTENSIONS = ("*.png", "*.jpg", "*.jpeg", "*.PNG", "*.JPG", "*.JPEG")
 
 
 def natural_key(path: Path):
-    """AEPCh01.001 < AEPCh01.002 < AEPCh01.010 처럼 숫자 기준으로 정렬되도록 하는 키"""
+    """AEP_CH01.001 < AEP_CH01.002 < AEP_CH01.010 처럼 숫자 기준으로 정렬되도록 하는 키"""
     return [int(t) if t.isdigit() else t.lower() for t in re.split(r"(\d+)", path.stem)]
+
+
+def resolve_chapter_dir(chapter: str) -> Path:
+    """chapter(Ch01 등) 폴더가 실제로 존재하는 상위 폴더를 찾아서 반환"""
+    for parent in _CANDIDATE_PARENT_DIRS:
+        candidate = parent / chapter
+        if candidate.exists():
+            return candidate
+    # 아무 데서도 못 찾으면 첫 번째 후보 경로를 기본값으로 반환 (에러 메시지용)
+    return _CANDIDATE_PARENT_DIRS[0] / chapter
 
 
 @st.cache_data
@@ -57,7 +60,7 @@ def load_slide_paths(chapter_dir: str):
 st.sidebar.markdown("---")
 selected_chapter = st.sidebar.selectbox("📂 챕터 선택", CHAPTERS, key="selected_chapter")
 
-CHAPTER_DIR = BASE_DIR / selected_chapter
+CHAPTER_DIR = resolve_chapter_dir(selected_chapter)
 slides = load_slide_paths(str(CHAPTER_DIR))
 
 # 챕터가 바뀌면 슬라이드 인덱스를 처음으로 초기화
@@ -70,7 +73,7 @@ elif st.session_state.current_chapter != selected_chapter:
 
 if not slides:
     st.error(f"슬라이드를 찾을 수 없습니다: {CHAPTER_DIR}")
-    st.info("이 폴더 안에 이미지 파일들을 넣어주세요. 예: AEPCh01.001.jpeg, AEPCh01.002.jpeg ...")
+    st.info("이 폴더 안에 이미지 파일들을 넣어주세요. 예: AEP_CH01.001.jpeg, AEPCh02.001.jpeg ...")
     st.stop()
 
 total = len(slides)
