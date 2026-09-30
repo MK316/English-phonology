@@ -1,11 +1,20 @@
 import re
 from pathlib import Path
+from urllib.parse import quote
 
+import requests
 import streamlit as st
 
-st.set_page_config(page_title="강의 슬라이드", layout="wide")
 
-# 화면 여백을 줄여서 슬라이드 이미지를 최대한 크게 보이도록 함
+# ============================================================
+# Page configuration
+# ============================================================
+
+st.set_page_config(
+    page_title="강의 슬라이드",
+    layout="wide"
+)
+
 st.markdown(
     """
     <style>
@@ -20,116 +29,618 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# ---------------- 슬라이드 폴더 위치 자동 감지 ----------------
-# 챕터별로 상위 폴더명이 "lectureslide" / "lectureslides"로 섞여 있어도
-# 각 챕터 폴더가 실제로 들어있는 쪽을 챕터마다 찾아서 사용하도록 처리
-_CANDIDATE_PARENT_NAMES = ["lectureslides", "lectureslide"]
-_CANDIDATE_PARENT_DIRS = [Path(__file__).parent / name for name in _CANDIDATE_PARENT_NAMES]
 
-CHAPTERS = [f"Ch{str(i).zfill(2)}" for i in range(1, 8)]  # Ch01 ~ Ch07
-IMAGE_EXTENSIONS = ("*.png", "*.jpg", "*.jpeg", "*.PNG", "*.JPG", "*.JPEG")
+# ============================================================
+# GitHub configuration
+# ============================================================
 
+GITHUB_OWNER = "MK316"
+GITHUB_REPO = "English-phonology"
+GITHUB_BRANCH = "main"
 
-def natural_key(path: Path):
-    """AEP_CH01.001 < AEP_CH01.002 < AEP_CH01.010 처럼 숫자 기준으로 정렬되도록 하는 키"""
-    return [int(t) if t.isdigit() else t.lower() for t in re.split(r"(\d+)", path.stem)]
+GITHUB_SLIDE_FOLDER = "pages/lectureslides"
 
+GITHUB_API = (
+    f"https://api.github.com/repos/"
+    f"{GITHUB_OWNER}/{GITHUB_REPO}/contents"
+)
 
-def resolve_chapter_dir(chapter: str) -> Path:
-    """chapter(Ch01 등) 폴더가 실제로 존재하는 상위 폴더를 찾아서 반환"""
-    for parent in _CANDIDATE_PARENT_DIRS:
-        candidate = parent / chapter
-        if candidate.exists():
-            return candidate
-    # 아무 데서도 못 찾으면 첫 번째 후보 경로를 기본값으로 반환 (에러 메시지용)
-    return _CANDIDATE_PARENT_DIRS[0] / chapter
+RAW_BASE = (
+    f"https://raw.githubusercontent.com/"
+    f"{GITHUB_OWNER}/{GITHUB_REPO}/"
+    f"{GITHUB_BRANCH}"
+)
 
 
-@st.cache_data
-def load_slide_paths(chapter_dir: str):
-    p = Path(chapter_dir)
-    files = []
-    for pattern in IMAGE_EXTENSIONS:
-        files.extend(p.glob(pattern))
-    files = sorted(set(files), key=natural_key)
-    return [str(f) for f in files]
+# ============================================================
+# Chapter configuration
+# ============================================================
+
+CHAPTERS = [
+    f"Ch{i:02d}"
+    for i in range(1, 8)
+]
+
+IMAGE_EXTENSIONS = {
+    ".png",
+    ".jpg",
+    ".jpeg",
+}
 
 
-# ---------------- 왼쪽 메뉴(사이드바) 하단 - 챕터 선택 드롭다운 ----------------
-# 자동으로 생성되는 페이지 메뉴(멀티페이지 네비게이션) 아래쪽에 표시됩니다.
+# ============================================================
+# Local folder search
+# ============================================================
+
+def find_local_chapter_dir(chapter):
+
+    """
+    Search for chapter folders in several possible
+    local directory structures.
+    """
+
+    current_dir = Path(__file__).resolve().parent
+
+    parent_names = [
+        "lectureslides",
+        "lectureslide",
+    ]
+
+    # Search current directory and its parent directories.
+    search_roots = [
+        current_dir,
+        *current_dir.parents
+    ]
+
+    for root in search_roots:
+
+        for parent_name in parent_names:
+
+            possible_dirs = [
+                root / parent_name / chapter,
+                root / "pages" / parent_name / chapter,
+            ]
+
+            for candidate in possible_dirs:
+
+                if candidate.is_dir():
+
+                    return candidate
+
+    return None
+
+
+# ============================================================
+# Natural sorting
+# ============================================================
+
+def natural_key(filename):
+
+    """
+    Sort filenames numerically.
+
+    Example:
+    AEPCh03.001
+    AEPCh03.002
+    AEPCh03.010
+    """
+
+    name = Path(str(filename)).stem
+
+    return [
+        int(part) if part.isdigit()
+        else part.lower()
+
+        for part in re.split(
+            r"(\d+)",
+            name
+        )
+    ]
+
+
+# ============================================================
+# Load local slides
+# ============================================================
+
+@st.cache_data(ttl=300)
+def load_local_slides(chapter_dir):
+
+    if not chapter_dir:
+        return []
+
+    folder = Path(chapter_dir)
+
+    if not folder.is_dir():
+        return []
+
+    files = [
+        file
+        for file in folder.iterdir()
+
+        if (
+            file.is_file()
+            and
+            file.suffix.lower() in IMAGE_EXTENSIONS
+        )
+    ]
+
+    files = sorted(
+        files,
+        key=lambda p: natural_key(p.name)
+    )
+
+    return [
+        str(file)
+        for file in files
+    ]
+
+
+# ============================================================
+# Load slides directly from GitHub
+# ============================================================
+
+@st.cache_data(ttl=300)
+def load_github_slides(chapter):
+
+    """
+    Retrieve all image filenames from GitHub API.
+    Construct raw image URLs.
+    """
+
+    folder_path = (
+        f"{GITHUB_SLIDE_FOLDER}/{chapter}"
+    )
+
+    api_url = (
+        f"{GITHUB_API}/{folder_path}"
+    )
+
+    headers = {
+        "Accept": "application/vnd.github+json"
+    }
+
+    try:
+
+        response = requests.get(
+            api_url,
+            params={
+                "ref": GITHUB_BRANCH
+            },
+            headers=headers,
+            timeout=15
+        )
+
+        response.raise_for_status()
+
+        items = response.json()
+
+        if not isinstance(items, list):
+            return []
+
+        image_files = []
+
+        for item in items:
+
+            filename = item.get(
+                "name",
+                ""
+            )
+
+            file_type = item.get(
+                "type",
+                ""
+            )
+
+            if file_type != "file":
+                continue
+
+            extension = Path(
+                filename
+            ).suffix.lower()
+
+            if extension not in IMAGE_EXTENSIONS:
+                continue
+
+            image_files.append(
+                filename
+            )
+
+        image_files = sorted(
+            image_files,
+            key=natural_key
+        )
+
+        image_urls = []
+
+        for filename in image_files:
+
+            safe_filename = quote(
+                filename
+            )
+
+            image_url = (
+                f"{RAW_BASE}/"
+                f"{folder_path}/"
+                f"{safe_filename}"
+            )
+
+            image_urls.append(
+                image_url
+            )
+
+        return image_urls
+
+    except requests.exceptions.RequestException:
+
+        return []
+
+
+# ============================================================
+# Combined slide loader
+# ============================================================
+
+def load_chapter_slides(chapter):
+
+    """
+    Priority:
+
+    1. Local chapter directory
+    2. GitHub repository
+    """
+
+    # Search local folders
+    local_dir = find_local_chapter_dir(
+        chapter
+    )
+
+    if local_dir:
+
+        local_slides = load_local_slides(
+            str(local_dir)
+        )
+
+        if local_slides:
+
+            return (
+                local_slides,
+                "Local",
+                str(local_dir)
+            )
+
+    # Fallback: GitHub
+    github_slides = load_github_slides(
+        chapter
+    )
+
+    if github_slides:
+
+        github_path = (
+            f"{GITHUB_SLIDE_FOLDER}/"
+            f"{chapter}"
+        )
+
+        return (
+            github_slides,
+            "GitHub",
+            github_path
+        )
+
+    return (
+        [],
+        "Not Found",
+        None
+    )
+
+
+# ============================================================
+# Sidebar: chapter selection
+# ============================================================
+
 st.sidebar.markdown("---")
-selected_chapter = st.sidebar.selectbox("📂 챕터 선택", CHAPTERS, key="selected_chapter")
 
-CHAPTER_DIR = resolve_chapter_dir(selected_chapter)
-slides = load_slide_paths(str(CHAPTER_DIR))
+selected_chapter = st.sidebar.selectbox(
+    "📂 챕터 선택",
+    CHAPTERS,
+    key="selected_chapter"
+)
 
-# 챕터가 바뀌면 슬라이드 인덱스를 처음으로 초기화
+
+# ============================================================
+# Load selected chapter
+# ============================================================
+
+slides, slide_source, slide_location = (
+    load_chapter_slides(
+        selected_chapter
+    )
+)
+
+
+# ============================================================
+# Reset index when chapter changes
+# ============================================================
+
 if "current_chapter" not in st.session_state:
-    st.session_state.current_chapter = selected_chapter
+
+    st.session_state.current_chapter = (
+        selected_chapter
+    )
+
     st.session_state.slide_idx = 0
-elif st.session_state.current_chapter != selected_chapter:
-    st.session_state.current_chapter = selected_chapter
+
+elif (
+    st.session_state.current_chapter
+    != selected_chapter
+):
+
+    st.session_state.current_chapter = (
+        selected_chapter
+    )
+
     st.session_state.slide_idx = 0
+
+
+# ============================================================
+# Error handling
+# ============================================================
 
 if not slides:
-    st.error(f"슬라이드를 찾을 수 없습니다: {CHAPTER_DIR}")
-    st.info("이 폴더 안에 이미지 파일들을 넣어주세요. 예: AEP_CH01.001.jpeg, AEPCh02.001.jpeg ...")
+
+    st.error(
+        f"슬라이드를 찾을 수 없습니다: "
+        f"{selected_chapter}"
+    )
+
+    st.info(
+        "로컬 폴더와 GitHub 저장소를 "
+        "모두 확인했지만 이미지가 발견되지 않았습니다."
+    )
+
+    st.code(
+        f"{GITHUB_SLIDE_FOLDER}/"
+        f"{selected_chapter}"
+    )
+
     st.stop()
 
-total = len(slides)
 
-# 챕터 전환 등으로 인덱스가 범위를 벗어난 경우 보정
+# ============================================================
+# Slide information
+# ============================================================
+
+total = len(
+    slides
+)
+
 if st.session_state.slide_idx >= total:
+
     st.session_state.slide_idx = 0
 
 
-def go_to(idx: int):
-    st.session_state.slide_idx = max(0, min(idx, total - 1))
+# ============================================================
+# Navigation function
+# ============================================================
+
+def go_to(idx):
+
+    st.session_state.slide_idx = max(
+        0,
+        min(
+            idx,
+            total - 1
+        )
+    )
 
 
-# ---------------- 상단 네비게이션 버튼 ----------------
-nav_cols = st.columns([1, 1, 1, 1, 1, 1, 2])
+# ============================================================
+# Navigation controls
+# ============================================================
+
+nav_cols = st.columns(
+    [1, 1, 1, 1, 1, 1, 2]
+)
+
+
+# First slide
 with nav_cols[0]:
-    if st.button("⏮ 처음", use_container_width=True):
+
+    if st.button(
+        "⏮ 처음",
+        use_container_width=True
+    ):
+
         go_to(0)
+
+
+# Previous slide
 with nav_cols[1]:
-    if st.button("◀ 이전", use_container_width=True):
-        go_to(st.session_state.slide_idx - 1)
+
+    if st.button(
+        "◀ 이전",
+        use_container_width=True
+    ):
+
+        go_to(
+            st.session_state.slide_idx - 1
+        )
+
+
+# Next slide
 with nav_cols[2]:
-    if st.button("다음 ▶", use_container_width=True):
-        go_to(st.session_state.slide_idx + 1)
+
+    if st.button(
+        "다음 ▶",
+        use_container_width=True
+    ):
+
+        go_to(
+            st.session_state.slide_idx + 1
+        )
+
+
+# Last slide
 with nav_cols[3]:
-    if st.button("마지막 ⏭", use_container_width=True):
-        go_to(total - 1)
+
+    if st.button(
+        "마지막 ⏭",
+        use_container_width=True
+    ):
+
+        go_to(
+            total - 1
+        )
+
+
+# Jump to slide
 with nav_cols[4]:
+
     jump_num = st.number_input(
         "이동",
         min_value=1,
         max_value=total,
-        value=st.session_state.slide_idx + 1,
+        value=(
+            st.session_state.slide_idx + 1
+        ),
         step=1,
-        label_visibility="collapsed",
+        label_visibility="collapsed"
     )
+
+
 with nav_cols[5]:
-    if st.button("이동", use_container_width=True):
-        go_to(int(jump_num) - 1)
+
+    if st.button(
+        "이동",
+        use_container_width=True
+    ):
+
+        go_to(
+            int(jump_num) - 1
+        )
+
+
+# Current position
 with nav_cols[6]:
-    st.caption(f"**{selected_chapter}**  |  슬라이드 {st.session_state.slide_idx + 1} / {total}")
 
-# ---------------- 현재 슬라이드 표시 (최대한 크게) ----------------
-st.image(slides[st.session_state.slide_idx], use_container_width=True)
+    st.caption(
+        f"**{selected_chapter}**"
+        f" | "
+        f"슬라이드 "
+        f"{st.session_state.slide_idx + 1}"
+        f" / "
+        f"{total}"
+    )
 
-# ---------------- 전체 슬라이드 미리보기 ----------------
-with st.expander("📑 전체 슬라이드 미리보기", expanded=False):
+
+# ============================================================
+# Display current slide
+# ============================================================
+
+current_slide = slides[
+    st.session_state.slide_idx
+]
+
+st.image(
+    current_slide,
+    use_container_width=True
+)
+
+
+# ============================================================
+# Slide previews
+# ============================================================
+
+with st.expander(
+    "📑 전체 슬라이드 미리보기",
+    expanded=False
+):
+
     cols_per_row = 5
-    for row_start in range(0, total, cols_per_row):
-        row_slides = slides[row_start: row_start + cols_per_row]
-        cols = st.columns(cols_per_row)
-        for i, slide_path in enumerate(row_slides):
+
+    for row_start in range(
+        0,
+        total,
+        cols_per_row
+    ):
+
+        row_slides = slides[
+            row_start:
+            row_start + cols_per_row
+        ]
+
+        cols = st.columns(
+            cols_per_row
+        )
+
+        for i, slide_path in enumerate(
+            row_slides
+        ):
+
             idx = row_start + i
+
             with cols[i]:
-                st.image(slide_path, use_container_width=True)
-                label = f"📍 {idx + 1} (현재)" if idx == st.session_state.slide_idx else f"{idx + 1}번으로 이동"
-                if st.button(label, key=f"thumb_{idx}", use_container_width=True):
-                    go_to(idx)
+
+                st.image(
+                    slide_path,
+                    use_container_width=True
+                )
+
+                if (
+                    idx
+                    == st.session_state.slide_idx
+                ):
+
+                    label = (
+                        f"📍 {idx + 1} (현재)"
+                    )
+
+                else:
+
+                    label = (
+                        f"{idx + 1}번으로 이동"
+                    )
+
+                if st.button(
+                    label,
+                    key=f"thumb_{idx}",
+                    use_container_width=True
+                ):
+
+                    go_to(
+                        idx
+                    )
+
                     st.rerun()
+
+
+# ============================================================
+# Optional source information
+# ============================================================
+
+with st.sidebar.expander(
+    "📁 Slide information"
+):
+
+    st.write(
+        f"Chapter: {selected_chapter}"
+    )
+
+    st.write(
+        f"Total slides: {total}"
+    )
+
+    st.write(
+        f"Source: {slide_source}"
+    )
+
+    st.write(
+        f"Location: {slide_location}"
+    )
+
+    if st.button(
+        "🔄 Refresh slide list"
+    ):
+
+        load_local_slides.clear()
+        load_github_slides.clear()
+
+        st.rerun()
