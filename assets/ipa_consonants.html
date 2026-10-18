@@ -252,12 +252,14 @@ buildChart(); newQ2();
 
 // ---- TAB 3: describe the symbol ----
 const s3 = { q: null, checked: false, score: 0, total: 0 };
+// Most consonants are oral and central, so these start pre-selected (students change them only for nasals, [l] and [ʔ]).
+const DEFAULT3 = { oro: "oral", central: "central" };
 $("q3").innerHTML = FIELDS.map(f =>
   `<div><label for="a_${f.key}">${f.label}</label><select id="a_${f.key}"><option value="">Choose…</option>${f.values.map(v => `<option>${v}</option>`).join("")}</select><span class="fix" id="x_${f.key}"></span></div>`).join("");
 function newQ3() {
   s3.q = pickRandom(C, s3.q); s3.checked = false;
   $("sym3").textContent = `[ ${s3.q.symbol} ]`;
-  FIELDS.forEach(f => { const el = $("a_" + f.key); el.value = ""; el.className = ""; $("x_" + f.key).textContent = ""; });
+  FIELDS.forEach(f => { const el = $("a_" + f.key); el.value = DEFAULT3[f.key] || ""; el.className = ""; $("x_" + f.key).textContent = ""; });
   $("msg3").hidden = true;
   renderScore3();
 }
