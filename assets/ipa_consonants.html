@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IPA Consonant Practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&family=Noto+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f6f4ef; --paper: #ffffff; --ink: #1b1b1b; --muted: #5d5a54; --line: #d9d4ca;
+    --accent: #1f4e8c; --accent-ink: #ffffff; --soft: #eef2f8;
+    --ok: #1d7a46; --ok-bg: #e7f5ec; --bad: #b3261e; --bad-bg: #fbeceb;
+    --navy: #1b2a4e; --yellow: #ffd84d;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #151515; --paper: #1f1f1f; --ink: #ececec; --muted: #a7a39b; --line: #3a3a3a;
+      --accent: #7fa8e6; --accent-ink: #0e1a2b; --soft: #22293a;
+      --ok: #6fd39a; --ok-bg: #16301f; --bad: #f2928b; --bad-bg: #3a1c1a;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #151515; --paper: #1f1f1f; --ink: #ececec; --muted: #a7a39b; --line: #3a3a3a;
+    --accent: #7fa8e6; --accent-ink: #0e1a2b; --soft: #22293a;
+    --ok: #6fd39a; --ok-bg: #16301f; --bad: #f2928b; --bad-bg: #3a1c1a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Noto Sans", system-ui, sans-serif; font-size: 16px; line-height: 1.55; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 24px 16px 56px; }
+  h1 { font-size: 1.35rem; font-weight: 600; margin: 0 0 14px; }
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); overflow-x: auto; }
+  .tab { font: inherit; font-weight: 600; font-size: 0.95rem; background: none; border: none; border-bottom: 3px solid transparent; padding: 10px 14px; color: var(--muted); cursor: pointer; white-space: nowrap; }
+  .tab[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+  .panel { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 22px; margin-top: 18px; }
+  @media (max-width: 720px) { .panel { padding: 16px 10px; } .wrap { padding: 16px 8px 40px; } }
+  h2 { font-size: 1.1rem; margin: 0 0 14px; }
+  .muted { color: var(--muted); font-size: 0.9rem; }
+  .filters { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+  .filters label, .q3 label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 4px; }
+  select { font: inherit; width: 100%; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+  select:focus, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .results { margin-top: 18px; }
+  .group { padding: 8px 0; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 10px; align-items: baseline; }
+  .sym { font-family: "Noto Serif", serif; font-size: 1.7rem; }
+  .btn { font: inherit; font-weight: 600; font-size: 0.92rem; border-radius: 8px; padding: 9px 16px; cursor: pointer; border: 1px solid var(--accent); background: var(--paper); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); }
+  .btn.small { border-color: var(--line); color: var(--ink); }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 16px; }
+  .score { margin-left: auto; font-weight: 600; }
+  .desc { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin: 6px 0 4px; }
+  @media (max-width: 640px) { .desc { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .feat { min-width: 0; text-align: center; }
+  .feat small { display: flex; align-items: flex-end; justify-content: center; min-height: 2.6em; line-height: 1.3; font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .feat span {
+    display: flex; align-items: center; justify-content: center; min-height: 52px; padding: 8px 6px; border-radius: 10px;
+    font-size: clamp(0.95rem, 2.4vw, 1.25rem); font-weight: 600; overflow-wrap: anywhere;
+  }
+  .feat.main span { background: var(--navy); color: var(--yellow); }   /* voicing, place, manner */
+  .feat.sub span { background: var(--soft); color: var(--ink); }       /* oro-nasal, central/lateral */
+  .chart-wrap { margin-top: 18px; }
+  /* The chart always fits the available width: 9 equal columns that shrink with the screen. */
+  table.chart { border-collapse: collapse; width: 100%; table-layout: fixed; }
+  table.chart td { border: 1px solid var(--line); padding: 2px; height: 54px; text-align: center; vertical-align: middle; }
+  .cellpair { display: flex; justify-content: space-evenly; align-items: center; gap: 0; }
+  .pick {
+    font-family: "Noto Serif", serif; font-size: clamp(1rem, 3.2vw, 1.5rem); line-height: 1;
+    min-width: 0; height: 42px; padding: 0 clamp(2px, 0.8vw, 6px);
+    border: 1.5px solid transparent; border-radius: 7px; background: transparent; color: var(--ink); cursor: pointer;
+  }
+  .pick:hover { background: var(--soft); border-color: var(--line); }
+  .pick.ok { background: var(--ok-bg); border-color: var(--ok); color: var(--ok); }
+  .pick.bad { background: var(--bad-bg); border-color: var(--bad); color: var(--bad); }
+  .msg { margin-top: 14px; padding: 10px 14px; border-radius: 8px; font-weight: 600; }
+  .msg.ok { background: var(--ok-bg); color: var(--ok); }
+  .msg.bad { background: var(--bad-bg); color: var(--bad); }
+  .bigsym { font-family: "Noto Serif", serif; font-size: 4.5rem; text-align: center; padding: 10px 0 18px; line-height: 1.1; }
+  .q3 { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+  @media (max-width: 640px) { .q3 { grid-template-columns: 1fr 1fr; } }
+  .q3 select.ok { border-color: var(--ok); background: var(--ok-bg); }
+  .q3 select.bad { border-color: var(--bad); background: var(--bad-bg); }
+  .fix { display: block; font-size: 0.8rem; color: var(--bad); margin-top: 3px; min-height: 1.2em; }
+  .note { font-size: 0.82rem; color: var(--muted); margin: 8px 0 0; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>IPA Consonant Practice</h1>
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-tab="t1">[1] Explore Sounds</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="t2">[2] Identify Symbol</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="t3">[3] Describe Symbol</button>
+  </div>
+
+  <!-- TAB 1 -->
+  <section class="panel" id="t1" role="tabpanel">
+    <h2>IPA Sound Filter</h2>
+    <div class="filters" id="filters"></div>
+    <p class="note">NA = not applicable: the property does not apply to this sound (e.g., voicing for the glottal stop; central/lateral for nasals).</p>
+    <div class="results" id="results"></div>
+  </section>
+
+  <!-- TAB 2 -->
+  <section class="panel" id="t2" role="tabpanel" hidden>
+    <h2>Identify the IPA symbol</h2>
+    <p class="muted">Read the description, then click the matching symbol in the chart.</p>
+    <div class="desc" id="desc2"></div>
+    <p class="note">Dark boxes show the terms needed to describe the sound. Light boxes show values that are usually left out (oral, central) or do not apply. NA = not applicable: the property does not apply to this sound (e.g., voicing for the glottal stop; central/lateral for nasals).</p>
+    <div class="chart-wrap"><table class="chart" id="chart"></table></div>
+    <div class="msg" id="msg2" hidden aria-live="polite"></div>
+    <div class="row">
+      <button class="btn primary" id="next2">Next</button>
+      <button class="btn small" id="reset2">Reset score</button>
+      <span class="score" id="score2"></span>
+    </div>
+  </section>
+
+  <!-- TAB 3 -->
+  <section class="panel" id="t3" role="tabpanel" hidden>
+    <h2>Describe the IPA symbol</h2>
+    <p class="muted">Choose the five properties of the symbol, then check your answer.</p>
+    <div class="bigsym" id="sym3"></div>
+    <div class="q3" id="q3"></div>
+    <p class="note">NA = not applicable: the property does not apply to this sound (e.g., voicing for the glottal stop; central/lateral for nasals).</p>
+    <div class="msg" id="msg3" hidden aria-live="polite"></div>
+    <div class="row">
+      <button class="btn primary" id="check3">Check answer</button>
+      <button class="btn" id="next3">Next symbol</button>
+      <button class="btn small" id="reset3">Reset score</button>
+      <span class="score" id="score3"></span>
+    </div>
+  </section>
+</div>
+
+<script>
+// ---- Data (from the original app; nasals are nasal stops; "NA" where a property does not apply) ----
+const C = [
+  ["p","voiceless","bilabial","oral","central","stop"], ["b","voiced","bilabial","oral","central","stop"],
+  ["t","voiceless","alveolar","oral","central","stop"], ["d","voiced","alveolar","oral","central","stop"],
+  ["k","voiceless","velar","oral","central","stop"], ["g","voiced","velar","oral","central","stop"],
+  ["f","voiceless","labiodental","oral","central","fricative"], ["v","voiced","labiodental","oral","central","fricative"],
+  ["θ","voiceless","dental","oral","central","fricative"], ["ð","voiced","dental","oral","central","fricative"],
+  ["s","voiceless","alveolar","oral","central","fricative"], ["z","voiced","alveolar","oral","central","fricative"],
+  ["ʃ","voiceless","post-alveolar","oral","central","fricative"], ["ʒ","voiced","post-alveolar","oral","central","fricative"],
+  ["h","voiceless","glottal","oral","central","fricative"],
+  ["tʃ","voiceless","post-alveolar","oral","central","affricate"], ["dʒ","voiced","post-alveolar","oral","central","affricate"],
+  ["m","voiced","bilabial","nasal","NA","stop"], ["n","voiced","alveolar","nasal","NA","stop"],
+  ["ŋ","voiced","velar","nasal","NA","stop"],
+  ["ɾ","voiced","alveolar","oral","central","tap/flap"],
+  ["ʔ","NA","glottal","NA","NA","stop"],
+  ["l","voiced","alveolar","oral","lateral","approximant"], ["ɹ","voiced","alveolar","oral","central","approximant"],
+  ["j","voiced","palatal","oral","central","approximant"], ["w","voiced","labio-velar","oral","central","approximant"],
+].map(([symbol, voicing, place, oro, central, manner]) => ({ symbol, voicing, place, oro, central, manner }));
+
+const FIELDS = [
+  { key: "voicing", label: "Voicing", values: ["voiced", "voiceless", "NA"] },
+  { key: "place", label: "Place", values: ["bilabial","labiodental","dental","alveolar","post-alveolar","palatal","labio-velar","velar","glottal","NA"] },
+  { key: "oro", label: "Oro-nasal", values: ["oral", "nasal", "NA"] },
+  { key: "central", label: "Central / lateral", values: ["central", "lateral", "NA"] },
+  { key: "manner", label: "Manner", values: ["stop", "tap/flap", "fricative", "affricate", "approximant", "NA"] },
+];
+const PLACES = FIELDS[1].values.filter(v => v !== "NA");
+
+// Chart rows and columns follow the usual IPA order; no labels are shown.
+const ROWS = [
+  c => c.manner === "stop" && c.oro !== "nasal",
+  c => c.manner === "stop" && c.oro === "nasal",
+  c => c.manner === "tap/flap",
+  c => c.manner === "fricative",
+  c => c.manner === "affricate",
+  c => c.manner === "approximant" && c.central === "central",
+  c => c.manner === "approximant" && c.central === "lateral",
+];
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const pickRandom = (arr, not) => { let x; do { x = arr[Math.floor(Math.random() * arr.length)]; } while (arr.length > 1 && x === not); return x; };
+
+// ---- Tabs ----
+document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => {
+  document.querySelectorAll(".tab").forEach(b => b.setAttribute("aria-selected", b === t));
+  document.querySelectorAll("[role=tabpanel]").forEach(p => p.hidden = p.id !== t.dataset.tab);
+}));
+
+// ---- TAB 1: filter ----
+$("filters").innerHTML = FIELDS.map(f =>
+  `<div><label for="f_${f.key}">${f.label}</label><select id="f_${f.key}"><option value="">Any</option>${f.values.map(v => `<option>${v}</option>`).join("")}</select></div>`).join("");
+function renderFilter() {
+  const want = Object.fromEntries(FIELDS.map(f => [f.key, $("f_" + f.key).value]));
+  const hits = C.filter(c => FIELDS.every(f => !want[f.key] || c[f.key] === want[f.key]));
+  let h = `<p><strong>${hits.length} result(s)</strong></p>`;
+  if (!hits.length) h += `<p class="muted">No matching sounds found.</p>`;
+  PLACES.forEach(pl => {
+    const g = hits.filter(c => c.place === pl);
+    if (g.length) h += `<div class="group">${g.map(c => `<span class="sym">${esc(c.symbol)}</span>`).join(" ")}<span class="muted">(${pl})</span></div>`;
+  });
+  $("results").innerHTML = h;
+}
+FIELDS.forEach(f => $("f_" + f.key).addEventListener("change", renderFilter));
+renderFilter();
+
+// ---- TAB 2: identify symbol in the chart ----
+const s2 = { q: null, answered: false, score: 0, total: 0 };
+function buildChart() {
+  let h = "";
+  ROWS.forEach(rowTest => {
+    h += "<tr>";
+    PLACES.forEach(pl => {
+      const cell = C.filter(c => rowTest(c) && c.place === pl)
+        .sort((a, b) => (a.voicing === "voiceless" ? 0 : 1) - (b.voicing === "voiceless" ? 0 : 1));
+      h += `<td>${cell.length ? `<div class="cellpair">${cell.map(c => `<button class="pick" data-s="${esc(c.symbol)}" aria-label="${esc(c.symbol)}">${esc(c.symbol)}</button>`).join("")}</div>` : ""}</td>`;
+    });
+    h += "</tr>";
+  });
+  $("chart").innerHTML = h;
+  $("chart").querySelectorAll(".pick").forEach(b => b.addEventListener("click", () => answer2(b)));
+}
+function newQ2() {
+  s2.q = pickRandom(C, s2.q); s2.answered = false;
+  $("desc2").innerHTML = FIELDS.map(f => {
+    // voicing, place, manner are always needed; "nasal" and "lateral" are needed when they apply;
+    // "oral", "central" (the defaults) and NA are left out of a normal description.
+    const v = s2.q[f.key];
+    const essential = v !== "NA" && ((f.key !== "oro" && f.key !== "central") || v === "nasal" || v === "lateral");
+    const kind = essential ? "main" : "sub";
+    return `<div class="feat ${kind}"><small>${f.label}</small><span>${esc(s2.q[f.key])}</span></div>`;
+  }).join("");
+  $("chart").querySelectorAll(".pick").forEach(b => b.className = "pick");
+  $("msg2").hidden = true;
+  renderScore2();
+}
+function answer2(btn) {
+  const right = btn.dataset.s === s2.q.symbol;
+  if (!s2.answered) { s2.total++; if (right) s2.score++; s2.answered = true; }
+  btn.classList.add(right ? "ok" : "bad");
+  const m = $("msg2");
+  if (right) {
+    m.className = "msg ok";
+    m.textContent = s2.score === 20 && s2.total === 20 ? "🎉 Correct! 20 out of 20 — perfect!" : "✅ Correct!";
+  } else {
+    m.className = "msg bad"; m.textContent = `❌ [${btn.dataset.s}] is not the answer. Try again.`;
+  }
+  m.hidden = false;
+  renderScore2();
+}
+function renderScore2() { $("score2").textContent = `Score: ${s2.score} / ${s2.total}`; }
+$("next2").addEventListener("click", newQ2);
+$("reset2").addEventListener("click", () => { s2.score = 0; s2.total = 0; newQ2(); });
+buildChart(); newQ2();
+
+// ---- TAB 3: describe the symbol ----
+const s3 = { q: null, checked: false, score: 0, total: 0 };
+$("q3").innerHTML = FIELDS.map(f =>
+  `<div><label for="a_${f.key}">${f.label}</label><select id="a_${f.key}"><option value="">Choose…</option>${f.values.map(v => `<option>${v}</option>`).join("")}</select><span class="fix" id="x_${f.key}"></span></div>`).join("");
+function newQ3() {
+  s3.q = pickRandom(C, s3.q); s3.checked = false;
+  $("sym3").textContent = `[ ${s3.q.symbol} ]`;
+  FIELDS.forEach(f => { const el = $("a_" + f.key); el.value = ""; el.className = ""; $("x_" + f.key).textContent = ""; });
+  $("msg3").hidden = true;
+  renderScore3();
+}
+function check3() {
+  let ok = 0;
+  FIELDS.forEach(f => {
+    const el = $("a_" + f.key);
+    const right = el.value === s3.q[f.key];
+    el.className = right ? "ok" : "bad";
+    $("x_" + f.key).textContent = right ? "" : `→ ${s3.q[f.key]}`;
+    if (right) ok++;
+  });
+  if (!s3.checked) { s3.total++; if (ok === FIELDS.length) s3.score++; s3.checked = true; }
+  const m = $("msg3");
+  m.className = ok === FIELDS.length ? "msg ok" : "msg bad";
+  m.textContent = ok === FIELDS.length ? `✅ Correct! [ ${s3.q.symbol} ] — ${FIELDS.map(f => `${f.label}: ${s3.q[f.key]}`).join(" · ")}`
+                                       : `${ok} of ${FIELDS.length} correct. The corrections are shown in red.`;
+  m.hidden = false;
+  renderScore3();
+}
+function renderScore3() { $("score3").textContent = `Score: ${s3.score} / ${s3.total}`; }
+$("check3").addEventListener("click", check3);
+$("next3").addEventListener("click", newQ3);
+$("reset3").addEventListener("click", () => { s3.score = 0; s3.total = 0; newQ3(); });
+newQ3();
+</script>
+</body>
+</html>
